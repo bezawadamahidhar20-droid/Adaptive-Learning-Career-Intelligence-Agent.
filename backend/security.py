@@ -14,8 +14,26 @@ from typing import Optional, Dict, Any
 from fastapi import Depends, HTTPException, status, Header
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .database import get_db_connection
+import logging
+import secrets
 
-SECRET_KEY = os.environ.get("AUTH_SECRET", "synapsecat_production_secret_key_2026_super_secure_984372981723")
+logger = logging.getLogger("backend.security")
+
+def _get_secret_key() -> str:
+    env_secret = os.environ.get("AUTH_SECRET")
+    app_env = os.environ.get("APP_ENV", os.environ.get("ENVIRONMENT", "development")).lower()
+    
+    if env_secret and env_secret.strip():
+        return env_secret.strip()
+        
+    if app_env in ("production", "prod"):
+        raise RuntimeError("CRITICAL SECURITY ERROR: AUTH_SECRET environment variable must be set in production mode.")
+    
+    ephemeral = secrets.token_urlsafe(32)
+    logger.warning("AUTH_SECRET environment variable is unset. Using ephemeral runtime secret for local session.")
+    return ephemeral
+
+SECRET_KEY = _get_secret_key()
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRATION_HOURS = 72
 

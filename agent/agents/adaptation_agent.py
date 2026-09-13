@@ -4,7 +4,7 @@ Coordinates online feedback loops:
 Assesses student performance changes → Recalculates skill mastery & theta →
 Updates gap priorities → Dynamically adapts learning roadmap & placement tasks.
 """
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from .roadmap_agent import RoadmapAgent, RoadmapTask
 from .skill_gap_agent import SkillGapAgent

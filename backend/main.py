@@ -4,6 +4,7 @@ Production-ready API with JWT auth, OAuth, Onboarding, Skills, Roadmaps & Placem
 """
 import os
 import sys
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -17,10 +18,17 @@ from backend.routers import (
 )
 from backend.database import init_db
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: initialize database schema & tables
+    init_db()
+    yield
+
 app = FastAPI(
     title="Adaptive Learning & Career Intelligence Agent API",
     description="LLM-free AI/ML adaptive testing & career intelligence platform powered by BKT, IRT, Bandits, and Multi-Agent sub-systems.",
-    version="2.0.0"
+    version="2.0.0",
+    lifespan=lifespan
 )
 
 # CORS configuration
@@ -51,10 +59,6 @@ if os.path.exists(frontend_dir):
     def serve_frontend_root():
         index_path = os.path.join(frontend_dir, "index.html")
         return FileResponse(index_path)
-
-@app.on_event("startup")
-def on_startup():
-    init_db()
 
 @app.get("/api/health")
 def health_check():

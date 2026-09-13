@@ -146,7 +146,7 @@ APP_ENV=development
 PORT=8000
 
 # Security & Authentication
-AUTH_SECRET=synapsecat_production_secret_key_2026_super_secure_984372981723
+AUTH_SECRET=changeme_replace_with_random_secret
 JWT_EXPIRATION_HOURS=72
 
 # Database Connection (SQLite by default; PostgreSQL supported for production)
