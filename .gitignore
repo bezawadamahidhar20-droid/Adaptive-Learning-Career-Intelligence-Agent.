@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Local runtime state
+# The SQLite schema is created automatically on import by backend/database.py (init_db),
+# so this file is regenerated locally rather than tracked.
+backend/adaptive_agent.db
+*.db
+*.sqlite3
+
+# Environment variables and secrets
+.env
+.env.*
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

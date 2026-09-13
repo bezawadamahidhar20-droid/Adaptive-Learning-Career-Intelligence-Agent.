@@ -1,0 +1,244 @@
+{
+  "concepts": {
+    "A/B Testing & Causal Inference": {
+      "p_guess": 0.2,
+      "p_init": 0.36,
+      "p_slip": 0.33,
+      "p_transit": 0.21
+    },
+    "Authentication & Security": {
+      "p_guess": 0.19,
+      "p_init": 0.51,
+      "p_slip": 0.3,
+      "p_transit": 0.2
+    },
+    "Bias-Variance Tradeoff": {
+      "p_guess": 0.35,
+      "p_init": 0.55,
+      "p_slip": 0.22,
+      "p_transit": 0.12
+    },
+    "Caching & Consistency": {
+      "p_guess": 0.22,
+      "p_init": 0.4,
+      "p_slip": 0.21,
+      "p_transit": 0.08
+    },
+    "Control Flow & Generators": {
+      "p_guess": 0.33,
+      "p_init": 0.54,
+      "p_slip": 0.23,
+      "p_transit": 0.25
+    },
+    "Data Types & Mutability": {
+      "p_guess": 0.43,
+      "p_init": 0.65,
+      "p_slip": 0.19,
+      "p_transit": 0.22
+    },
+    "Database Indexing & Query Plans": {
+      "p_guess": 0.19,
+      "p_init": 0.3,
+      "p_slip": 0.31,
+      "p_transit": 0.14
+    },
+    "Distributed Systems & Scalability": {
+      "p_guess": 0.21,
+      "p_init": 0.41,
+      "p_slip": 0.31,
+      "p_transit": 0.11
+    },
+    "Evaluation Metrics": {
+      "p_guess": 0.22,
+      "p_init": 0.45,
+      "p_slip": 0.22,
+      "p_transit": 0.19
+    },
+    "Gradient Boosting & Trees": {
+      "p_guess": 0.19,
+      "p_init": 0.31,
+      "p_slip": 0.26,
+      "p_transit": 0.14
+    },
+    "Graph Algorithms": {
+      "p_guess": 0.17,
+      "p_init": 0.58,
+      "p_slip": 0.33,
+      "p_transit": 0.15
+    },
+    "Hypothesis Testing & p-values": {
+      "p_guess": 0.34,
+      "p_init": 0.39,
+      "p_slip": 0.21,
+      "p_transit": 0.14
+    },
+    "Message Queues & Async Tasks": {
+      "p_guess": 0.27,
+      "p_init": 0.47,
+      "p_slip": 0.27,
+      "p_transit": 0.06
+    },
+    "Neural Network Fundamentals": {
+      "p_guess": 0.21,
+      "p_init": 0.51,
+      "p_slip": 0.26,
+      "p_transit": 0.11
+    },
+    "NumPy & Vectorization": {
+      "p_guess": 0.18,
+      "p_init": 0.53,
+      "p_slip": 0.26,
+      "p_transit": 0.19
+    },
+    "Pandas DataFrames": {
+      "p_guess": 0.31,
+      "p_init": 0.52,
+      "p_slip": 0.31,
+      "p_transit": 0.22
+    },
+    "Probability Distributions": {
+      "p_guess": 0.2,
+      "p_init": 0.53,
+      "p_slip": 0.31,
+      "p_transit": 0.09
+    },
+    "Python Concurrency & GIL": {
+      "p_guess": 0.2,
+      "p_init": 0.29,
+      "p_slip": 0.19,
+      "p_transit": 0.16
+    },
+    "RESTful APIs & HTTP": {
+      "p_guess": 0.28,
+      "p_init": 0.47,
+      "p_slip": 0.22,
+      "p_transit": 0.22
+    },
+    "Regularization & Loss Functions": {
+      "p_guess": 0.29,
+      "p_init": 0.4,
+      "p_slip": 0.33,
+      "p_transit": 0.08
+    },
+    "SQL Querying & Joins": {
+      "p_guess": 0.43,
+      "p_init": 0.61,
+      "p_slip": 0.23,
+      "p_transit": 0.18
+    },
+    "Time Complexity & Big-O": {
+      "p_guess": 0.32,
+      "p_init": 0.51,
+      "p_slip": 0.23,
+      "p_transit": 0.31
+    },
+    "Transformers & Attention": {
+      "p_guess": 0.21,
+      "p_init": 0.39,
+      "p_slip": 0.43,
+      "p_transit": 0.08
+    },
+    "Window Functions": {
+      "p_guess": 0.21,
+      "p_init": 0.49,
+      "p_slip": 0.25,
+      "p_transit": 0.14
+    }
+  },
+  "metadata": {
+    "concepts_calibrated": 24,
+    "irt_blend_weight": 0.3,
+    "metrics": {
+      "benchmarks_version": "2026.1",
+      "bkt_only": {
+        "all": {
+          "accuracy_percentage": 60.13,
+          "auc": 0.6336,
+          "brier_score": 0.2359,
+          "concept_majority_baseline_accuracy": 57.32,
+          "constant_majority_baseline_accuracy": 52.35,
+          "log_loss": 0.6643,
+          "positive_rate": 0.4765,
+          "predicted_positive_rate": 0.3838,
+          "rmse": 0.4857,
+          "total_interactions_evaluated": 25000
+        },
+        "holdout": {
+          "accuracy_percentage": 60.22,
+          "auc": 0.6326,
+          "brier_score": 0.2361,
+          "concept_majority_baseline_accuracy": 57.14,
+          "constant_majority_baseline_accuracy": 52.52,
+          "log_loss": 0.6647,
+          "positive_rate": 0.4748,
+          "predicted_positive_rate": 0.3786,
+          "rmse": 0.4859,
+          "total_interactions_evaluated": 5000
+        },
+        "train": {
+          "accuracy_percentage": 60.11,
+          "auc": 0.6339,
+          "brier_score": 0.2358,
+          "concept_majority_baseline_accuracy": 57.37,
+          "constant_majority_baseline_accuracy": 52.31,
+          "log_loss": 0.6642,
+          "positive_rate": 0.4769,
+          "predicted_positive_rate": 0.3851,
+          "rmse": 0.4856,
+          "total_interactions_evaluated": 20000
+        }
+      },
+      "blended": {
+        "all": {
+          "accuracy_percentage": 61.44,
+          "auc": 0.653,
+          "brier_score": 0.2324,
+          "concept_majority_baseline_accuracy": 57.32,
+          "constant_majority_baseline_accuracy": 52.35,
+          "log_loss": 0.657,
+          "positive_rate": 0.4765,
+          "predicted_positive_rate": 0.392,
+          "rmse": 0.482,
+          "total_interactions_evaluated": 25000
+        },
+        "holdout": {
+          "accuracy_percentage": 61.68,
+          "auc": 0.658,
+          "brier_score": 0.2313,
+          "concept_majority_baseline_accuracy": 57.14,
+          "constant_majority_baseline_accuracy": 52.52,
+          "log_loss": 0.6548,
+          "positive_rate": 0.4748,
+          "predicted_positive_rate": 0.3876,
+          "rmse": 0.481,
+          "total_interactions_evaluated": 5000
+        },
+        "train": {
+          "accuracy_percentage": 61.38,
+          "auc": 0.6517,
+          "brier_score": 0.2326,
+          "concept_majority_baseline_accuracy": 57.37,
+          "constant_majority_baseline_accuracy": 52.31,
+          "log_loss": 0.6576,
+          "positive_rate": 0.4769,
+          "predicted_positive_rate": 0.3931,
+          "rmse": 0.4823,
+          "total_interactions_evaluated": 20000
+        }
+      },
+      "dataset_path": "datasets\\adaptive_mastery_training_logs.csv",
+      "irt_blend_weight": 0.3
+    },
+    "split": {
+      "holdout_interactions": 5000,
+      "holdout_ratio": 0.2,
+      "holdout_students": 100,
+      "method": "student_level_holdout",
+      "seed": 42,
+      "train_interactions": 20000,
+      "train_students": 400
+    },
+    "trained_at": "2026-09-13T07:37:39.042323+00:00"
+  },
+  "version": 1
+}

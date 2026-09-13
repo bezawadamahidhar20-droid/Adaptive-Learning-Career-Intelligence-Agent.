@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SynapseCAT — Adaptive Learning & Career Intelligence Agent</title>
+  <meta name="description" content="LLM-free AI/ML adaptive learning platform powered by Bayesian Knowledge Tracing, Item Response Theory, Contextual Bandits, and Career Readiness Analytics.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="/static/index.css">
+</head>
+<body class="dark-theme">
+  <!-- Dynamic Background Glow -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand" id="nav-brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-atom"></i>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">Synapse<span class="gradient-text">CAT</span></span>
+          <span class="brand-badge">BKT + IRT Agent</span>
+        </div>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-link active" id="btn-tab-dashboard" onclick="switchView('dashboard')">
+          <i class="fa-solid fa-chart-pie"></i> <span>Dashboard</span>
+        </button>
+        <button class="nav-link" id="btn-tab-assessment" onclick="startNewAssessment()">
+          <i class="fa-solid fa-bolt"></i> <span>Adaptive Test</span>
+        </button>
+        <button class="nav-link" id="btn-tab-career" onclick="switchView('career')">
+          <i class="fa-solid fa-bullseye"></i> <span>Career Intelligence</span>
+        </button>
+        <button class="nav-link" id="btn-tab-theory" onclick="switchView('theory')">
+          <i class="fa-solid fa-brain"></i> <span>Agent Mechanics</span>
+        </button>
+      </nav>
+
+      <div class="user-pill" id="user-profile-widget">
+        <div class="user-avatar" id="user-avatar-initial">A</div>
+        <div class="user-info">
+          <span class="user-name" id="user-display-name">Alex Rivera</span>
+          <span class="user-role-tag" id="user-target-role-label">Data Scientist</span>
+        </div>
+        <button class="icon-btn" onclick="openProfileModal()" title="Switch Profile/Role" id="btn-switch-role">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main App Content Area -->
+  <main class="main-content">
+    
+    <!-- ==================== VIEW 1: DASHBOARD ==================== -->
+    <section id="view-dashboard" class="app-view active">
+      <!-- Hero Metric Highlights Banner -->
+      <div class="metrics-grid">
+        <!-- Readiness Card -->
+        <div class="glass-card stat-card glow-border-cyan">
+          <div class="stat-header">
+            <span class="stat-label">Career Readiness</span>
+            <span class="status-chip ready-chip" id="job-ready-badge">Calibrating</span>
+          </div>
+          <div class="stat-body flex-center-between">
+            <div class="stat-number-wrapper">
+              <h2 class="stat-val gradient-text" id="stat-readiness-val">58.4%</h2>
+              <p class="stat-sub" id="stat-readiness-target">Target: Data Scientist</p>
+            </div>
+            <div class="progress-ring-container">
+              <svg class="progress-ring" width="76" height="76">
+                <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.08)" stroke-width="7" fill="transparent" r="30" cx="38" cy="38"/>
+                <circle id="readiness-circle-progress" class="progress-ring-fill" stroke="url(#cyan-gradient)" stroke-width="7" stroke-dasharray="188.5" stroke-dashoffset="75" stroke-linecap="round" fill="transparent" r="30" cx="38" cy="38"/>
+                <defs>
+                  <linearGradient id="cyan-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#06b6d4" />
+                    <stop offset="100%" stop-color="#6366f1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- IRT Student Ability (Theta) Card -->
+        <div class="glass-card stat-card glow-border-indigo">
+          <div class="stat-header">
+            <span class="stat-label">Psychometric Ability (θ)</span>
+            <span class="model-badge">IRT 2PL</span>
+          </div>
+          <div class="stat-body">
+            <div class="stat-number-wrapper">
+              <h2 class="stat-val text-indigo" id="stat-theta-val">+0.42</h2>
+              <p class="stat-sub">Range: [-4.0, +4.0] (Std Norm)</p>
+            </div>
+            <div class="theta-gauge">
+              <div class="gauge-bar-track">
+                <div class="gauge-center-line"></div>
+                <div class="gauge-indicator" id="theta-gauge-marker" style="left: 55.2%;"></div>
+              </div>
+              <div class="gauge-labels">
+                <span>-3.0 Novice</span>
+                <span>0.0 Mean</span>
+                <span>+3.0 Expert</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weakest Skill / Urgent Action Card -->
+        <div class="glass-card stat-card glow-border-amber">
+          <div class="stat-header">
+            <span class="stat-label">Top Priority Gap</span>
+            <span class="status-chip alert-chip"><i class="fa-solid fa-triangle-exclamation"></i> High Impact</span>
+          </div>
+          <div class="stat-body">
+            <h3 class="stat-skill-title" id="top-priority-skill-name">Machine Learning</h3>
+            <p class="stat-sub" id="top-priority-desc">Mastery at 38% vs required 80% benchmark.</p>
+            <div class="card-action-link">
+              <span id="study-time-est">⏱️ ~2.5 hrs targeted practice</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Assessments & Accuracy Card -->
+        <div class="glass-card stat-card glow-border-emerald">
+          <div class="stat-header">
+            <span class="stat-label">Online BKT Updates</span>
+            <span class="status-chip live-chip"><i class="fa-solid fa-circle-dot fa-fade"></i> Active</span>
+          </div>
+          <div class="stat-body">
+            <h2 class="stat-val text-emerald" id="stat-attempts-val">25 <span class="sub-unit">items</span></h2>
+            <p class="stat-sub" id="stat-accuracy-val">Accuracy: 64.0% | Closed-form Bayesian updates</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Dashboard Content 2-Column Split -->
+      <div class="dashboard-split-grid">
+        <!-- Left: Skill Mastery Radar & Concept Breakdown -->
+        <div class="glass-card panel-card">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title"><i class="fa-solid fa-chart-simple text-indigo"></i> Skill Mastery Profile</h3>
+              <p class="panel-desc">Real-time Bayesian Knowledge Tracing per skill domain</p>
+            </div>
+          </div>
+          
+          <div class="skill-bars-container" id="skill-bars-list">
+            <!-- Dynamic Skill Bars Injected here -->
+          </div>
+        </div>
+
+        <!-- Right: Career Gap Action Matrix & Recommended Next Assignment -->
+        <div class="dashboard-right-col">
+          <!-- Next Assignment Launch Card -->
+          <div class="glass-card launch-card glow-gradient-indigo">
+            <div class="launch-content">
+              <div class="launch-badge"><i class="fa-solid fa-sparkles"></i> Adaptive Recommendation</div>
+              <h3 class="launch-title">Next Calibrated Assessment</h3>
+              <p class="launch-desc" id="next-assessment-desc">
+                Fisher-information CAT selected 10 targeted questions focusing on <strong>Machine Learning</strong> and <strong>Statistics</strong> with calibrated difficulty.
+              </p>
+              
+              <div class="target-concepts-tags" id="target-concepts-preview">
+                <span class="concept-tag"><i class="fa-solid fa-bolt"></i> Bias-Variance</span>
+                <span class="concept-tag"><i class="fa-solid fa-bolt"></i> Regularization (L1/L2)</span>
+                <span class="concept-tag"><i class="fa-solid fa-bolt"></i> Hypothesis Testing</span>
+              </div>
+
+              <div class="launch-btn-row">
+                <button class="primary-btn btn-lg" id="btn-start-recommended" onclick="startNewAssessment()">
+                  <i class="fa-solid fa-play"></i> Start Adaptive Assessment (10 Qs)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ranked Skill Gap Table -->
+          <div class="glass-card panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><i class="fa-solid fa-list-check text-cyan"></i> Career Gap Matrix</h3>
+            </div>
+            <div class="gap-table-wrapper">
+              <table class="data-table" id="dashboard-gap-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Skill Area</th>
+                    <th>Current</th>
+                    <th>Target</th>
+                    <th>Gap Weight</th>
+                  </tr>
+                </thead>
+                <tbody id="gap-table-body">
+                  <!-- Injected dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 2: ADAPTIVE ASSESSMENT ==================== -->
+    <section id="view-assessment" class="app-view">
+      <div class="assessment-container">
+        <!-- Assessment Top Bar -->
+        <div class="assessment-header glass-card">
+          <div class="test-progress-info">
+            <span class="badge badge-purple" id="test-skill-badge">Machine Learning</span>
+            <span class="badge badge-cyan" id="test-concept-badge">Bias-Variance Tradeoff</span>
+            <span class="badge badge-diff" id="test-diff-badge">Difficulty 3/5</span>
+          </div>
+          <div class="test-counter">
+            <span>Question <strong id="current-q-index">1</strong> of <strong id="total-q-count">10</strong></span>
+          </div>
+        </div>
+
+        <!-- Progress Bar Track -->
+        <div class="assessment-progress-track">
+          <div class="assessment-progress-bar" id="assessment-progress-fill" style="width: 10%;"></div>
+        </div>
+
+        <!-- Question Card -->
+        <div class="glass-card question-box" id="question-card">
+          <div class="q-source-meta" id="q-subtopic-text">Subtopic: Overfitting & Generalization Bounds</div>
+          <h2 class="q-title" id="question-text">
+            A model has near 0% training error but 45% validation error. Which problem does this signify?
+          </h2>
+
+          <!-- MCQ Options List -->
+          <div class="options-grid" id="options-container">
+            <!-- Options injected here -->
+          </div>
+
+          <!-- Real-Time Feedback Container (shown after option select) -->
+          <div class="feedback-box hidden" id="answer-feedback-box">
+            <div class="feedback-header" id="feedback-status-title">
+              <i class="fa-solid fa-circle-check"></i> Correct!
+            </div>
+            <p class="feedback-explanation" id="feedback-explanation-text">
+              A large gap between low training error and high validation error is the hallmark of high variance / overfitting.
+            </p>
+            <div class="mastery-delta-pill" id="feedback-mastery-delta">
+              <span>BKT Mastery: <strong>0.20 → 0.62 (+0.42)</strong></span>
+            </div>
+          </div>
+
+          <!-- Bottom Action Buttons -->
+          <div class="assessment-footer">
+            <button class="secondary-btn" id="btn-abort-test" onclick="switchView('dashboard')">
+              <i class="fa-solid fa-arrow-left"></i> Exit Test
+            </button>
+            <button class="primary-btn hidden" id="btn-next-question" onclick="nextQuestion()">
+              <span>Next Question</span> <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 3: ASSESSMENT RESULTS ==================== -->
+    <section id="view-results" class="app-view">
+      <div class="results-wrapper">
+        <div class="glass-card results-card">
+          <div class="results-hero">
+            <div class="results-badge"><i class="fa-solid fa-award"></i> Assessment Complete</div>
+            <h1 class="results-title">Great Progress!</h1>
+            <p class="results-subtitle">Here is how your knowledge model and career readiness updated.</p>
+
+            <div class="results-score-row">
+              <div class="result-score-block">
+                <span class="score-label">Score</span>
+                <span class="score-big gradient-text" id="result-score-val">80%</span>
+                <span class="score-sub" id="result-correct-ratio">8 / 10 Correct</span>
+              </div>
+              <div class="result-score-block">
+                <span class="score-label">Ability Update (θ)</span>
+                <span class="score-big text-indigo" id="result-theta-val">+0.54</span>
+                <span class="score-sub">CAT Converged</span>
+              </div>
+              <div class="result-score-block">
+                <span class="score-label">Career Readiness</span>
+                <span class="score-big text-cyan" id="result-readiness-val">62.8%</span>
+                <span class="score-sub" id="result-readiness-delta">+4.4% Gain</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mastery Transition Table -->
+          <div class="results-breakdown">
+            <h3 class="section-title"><i class="fa-solid fa-chart-line text-emerald"></i> Knowledge Tracing Updates (BKT)</h3>
+            <div class="breakdown-list" id="results-mastery-list">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <div class="results-actions">
+            <button class="primary-btn btn-lg" onclick="switchView('dashboard')">
+              <i class="fa-solid fa-house"></i> Return to Dashboard
+            </button>
+            <button class="secondary-btn btn-lg" onclick="startNewAssessment()">
+              <i class="fa-solid fa-repeat"></i> Practice Next Adaptive Set
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 4: CAREER INTELLIGENCE ==================== -->
+    <section id="view-career" class="app-view">
+      <div class="career-view-container">
+        <div class="glass-card career-header-card">
+          <div class="career-header-flex">
+            <div>
+              <h2 class="view-heading"><i class="fa-solid fa-crosshairs text-cyan"></i> Career Intelligence Hub</h2>
+              <p class="view-sub">Compare readiness across target industry roles and inspect skill requirement benchmarks.</p>
+            </div>
+            
+            <div class="role-selector-pill">
+              <label for="career-role-select">Target Role:</label>
+              <select id="career-role-select" class="custom-select" onchange="changeTargetRole(this.value)">
+                <option value="data_scientist">Data Scientist</option>
+                <option value="backend_developer">Backend Developer</option>
+                <option value="data_analyst">Data Analyst</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="career-grid">
+          <!-- Left: Role Profile Summary & Benchmarks -->
+          <div class="glass-card panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title" id="career-detail-role-title">Data Scientist</h3>
+            </div>
+            <p class="panel-desc" id="career-detail-role-desc">
+              Designs predictive machine learning models, statistical experiments, and data pipelines.
+            </p>
+
+            <div class="role-weights-breakdown" id="role-weights-container">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- Right: Detailed Skill Gap Action Plan -->
+          <div class="glass-card panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><i class="fa-solid fa-route text-indigo"></i> Personalized Action Plan</h3>
+            </div>
+            <div class="action-items-list" id="career-action-items-list">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 5: THEORY & MECHANICS ==================== -->
+    <section id="view-theory" class="app-view">
+      <div class="theory-container">
+        <div class="glass-card theory-hero">
+          <h2 class="view-heading"><i class="fa-solid fa-microchip text-indigo"></i> Agent Intelligence Core (LLM-Free)</h2>
+          <p class="view-sub">
+            Antigravity agent architecture powered by mathematical cognitive modeling, psychometrics, and reinforcement learning.
+          </p>
+        </div>
+
+        <div class="theory-cards-grid">
+          <!-- BKT Card -->
+          <div class="glass-card theory-card">
+            <div class="theory-icon"><i class="fa-solid fa-network-wired text-cyan"></i></div>
+            <h3 class="theory-title">1. Bayesian Knowledge Tracing (BKT)</h3>
+            <p class="theory-desc">
+              Models hidden student mastery $P(L_t)$ per concept through a 2-state Hidden Markov Model:
+            </p>
+            <div class="formula-box">
+              <code>P(L_t | Correct) = [P(L_t)(1-P_S)] / [P(L_t)(1-P_S) + (1-P(L_t))P_G]</code>
+              <code>P(L_{t+1}) = P(L_t | Obs) + (1 - P(L_t | Obs)) * P_T</code>
+            </div>
+            <ul class="theory-bullets">
+              <li><strong>P(T) Learn rate:</strong> 0.20</li>
+              <li><strong>P(G) Guess rate:</strong> 0.20</li>
+              <li><strong>P(S) Slip rate:</strong> 0.10</li>
+            </ul>
+          </div>
+
+          <!-- IRT Card -->
+          <div class="glass-card theory-card">
+            <div class="theory-icon"><i class="fa-solid fa-chart-area text-indigo"></i></div>
+            <h3 class="theory-title">2. Item Response Theory (2PL IRT)</h3>
+            <p class="theory-desc">
+              Estimates latent student ability $\theta \in [-4, +4]$ and item discrimination $a$ / difficulty $b$:
+            </p>
+            <div class="formula-box">
+              <code>P(\theta) = 1 / [1 + exp(-a(\theta - b))]</code>
+              <code>\Delta \theta = \alpha \cdot a \cdot (y - P(\theta))</code>
+            </div>
+            <ul class="theory-bullets">
+              <li>Item discrimination $a \in [1.0, 1.8]$</li>
+              <li>Calibrated item difficulty $b \in [-2.0, +2.0]$</li>
+            </ul>
+          </div>
+
+          <!-- Fisher CAT Card -->
+          <div class="glass-card theory-card">
+            <div class="theory-icon"><i class="fa-solid fa-filter text-emerald"></i></div>
+            <h3 class="theory-title">3. Fisher-Information CAT Selection</h3>
+            <p class="theory-desc">
+              Picks questions maximizing information gain at the student's current ability boundary:
+            </p>
+            <div class="formula-box">
+              <code>I(\theta) = a^2 \cdot P(\theta) \cdot (1 - P(\theta))</code>
+              <code>Score(q) = w_1 I(\theta) + w_2 Weakness + w_3 Novelty - w_4 Recency</code>
+            </div>
+            <ul class="theory-bullets">
+              <li>Maximum informativeness when $b = \theta$</li>
+              <li>Enforces 2–3 attempt cooldown on misses</li>
+            </ul>
+          </div>
+
+          <!-- Bandits Card -->
+          <div class="glass-card theory-card">
+            <div class="theory-icon"><i class="fa-solid fa-dice text-amber"></i></div>
+            <h3 class="theory-title">4. Contextual & $\epsilon$-Greedy Bandits</h3>
+            <p class="theory-desc">
+              Balances exploration of unpracticed concept tiers with exploitation of high-leverage learning gains:
+            </p>
+            <div class="formula-box">
+              <code>LinUCB: a^* = \arg\max (\hat{\theta}_a^T x + \alpha \sqrt{x^T A_a^{-1} x})</code>
+            </div>
+            <ul class="theory-bullets">
+              <li>Decaying $\epsilon$-greedy from 15% to 5%</li>
+              <li>Features: mastery, ability $\theta$, accuracy, time-delta</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- User Role Switcher Modal -->
+  <div class="modal-backdrop hidden" id="profile-modal">
+    <div class="glass-card modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-user-gear text-indigo"></i> Student Profile & Career Goal</h3>
+        <button class="close-btn" onclick="closeProfileModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="modal-input-name">Student Name</label>
+          <input type="text" id="modal-input-name" class="custom-input" value="Alex Rivera">
+        </div>
+        <div class="form-group">
+          <label for="modal-select-role">Target Career Track</label>
+          <select id="modal-select-role" class="custom-select">
+            <option value="data_scientist">Data Scientist</option>
+            <option value="backend_developer">Backend Developer</option>
+            <option value="data_analyst">Data Analyst</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="secondary-btn" onclick="closeProfileModal()">Cancel</button>
+        <button class="primary-btn" onclick="saveProfileModal()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

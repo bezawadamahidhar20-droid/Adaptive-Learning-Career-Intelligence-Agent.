@@ -1,0 +1,100 @@
+{
+  "roles": [
+    {
+      "role_id": "data_scientist",
+      "title": "Data Scientist",
+      "readiness_threshold": 78.0,
+      "required_skills": {
+        "Python": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.5
+        },
+        "Machine Learning": {
+          "weight": 0.27,
+          "benchmark_mastery": 0.8,
+          "min_theta": 0.75
+        },
+        "Statistics": {
+          "weight": 0.2,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.6
+        },
+        "SQL": {
+          "weight": 0.18,
+          "benchmark_mastery": 0.7,
+          "min_theta": 0.4
+        },
+        "Deep Learning": {
+          "weight": 0.1,
+          "benchmark_mastery": 0.65,
+          "min_theta": 0.3
+        }
+      }
+    },
+    {
+      "role_id": "backend_developer",
+      "title": "Backend Developer",
+      "readiness_threshold": 80.0,
+      "required_skills": {
+        "Python": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.8,
+          "min_theta": 0.6
+        },
+        "Backend Architecture": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.85,
+          "min_theta": 0.8
+        },
+        "SQL": {
+          "weight": 0.2,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.5
+        },
+        "System Design": {
+          "weight": 0.2,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.7
+        },
+        "Data Structures & Algorithms": {
+          "weight": 0.1,
+          "benchmark_mastery": 0.7,
+          "min_theta": 0.5
+        }
+      }
+    },
+    {
+      "role_id": "data_analyst",
+      "title": "Data Analyst",
+      "readiness_threshold": 75.0,
+      "required_skills": {
+        "SQL": {
+          "weight": 0.35,
+          "benchmark_mastery": 0.85,
+          "min_theta": 0.65
+        },
+        "Python": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.7,
+          "min_theta": 0.4
+        },
+        "Statistics": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.5
+        },
+        "Machine Learning": {
+          "weight": 0.15,
+          "benchmark_mastery": 0.6,
+          "min_theta": 0.2
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "version": "2026.1",
+    "source": "Aggregated Industry Tech Hiring Rubrics",
+    "total_roles": 3
+  }
+}
