@@ -294,6 +294,10 @@
 
         <!-- Question Card -->
         <div class="glass-card question-box" id="question-card">
+          <div class="selection-reason-pill" id="q-selection-reason">
+            <i class="fa-solid fa-brain text-cyan"></i>
+            <span id="q-selection-reason-text">Selected adaptively based on your knowledge state.</span>
+          </div>
           <div class="q-source-meta" id="q-subtopic-text">Subtopic: Conceptual Foundations</div>
           <h2 class="q-title" id="question-text">
             Loading adaptive item from item bank...
@@ -386,8 +390,10 @@
               <label for="career-role-select">Target Career Track:</label>
               <select id="career-role-select" class="custom-select" onchange="changeTargetRole(this.value)">
                 <option value="data_scientist">Data Scientist</option>
-                <option value="backend_developer">Backend Developer</option>
                 <option value="data_analyst">Data Analyst</option>
+                <option value="backend_developer">Backend Developer</option>
+                <option value="frontend_developer">Frontend Developer</option>
+                <option value="ai_ml_engineer">AI/ML Engineer</option>
               </select>
             </div>
           </div>
@@ -572,8 +578,10 @@
             <label for="onb-target-role">Primary Career Track Goal</label>
             <select id="onb-target-role" class="custom-select">
               <option value="data_scientist">Data Scientist (ML, Stats, Python, SQL)</option>
-              <option value="backend_developer">Backend Developer (APIs, System Design, SQL, DSA)</option>
               <option value="data_analyst">Data Analyst (SQL Analytics, Python, Stats)</option>
+              <option value="backend_developer">Backend Developer (APIs, System Design, SQL, DSA)</option>
+              <option value="frontend_developer">Frontend Developer (Architecture, JS/TS, CSS, Core Web Vitals)</option>
+              <option value="ai_ml_engineer">AI/ML Engineer (Transformers, MLOps, Deep Learning, Distributed Systems)</option>
             </select>
           </div>
 

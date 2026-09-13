@@ -598,6 +598,11 @@ function renderQuestion() {
   document.getElementById("q-subtopic-text").textContent = `Subtopic: ${q.subtopic || q.concept}`;
   document.getElementById("question-text").textContent = q.question;
 
+  const reasonEl = document.getElementById("q-selection-reason-text");
+  if (reasonEl) {
+    reasonEl.textContent = q.selection_reason || "Selected based on Fisher information optimization and mastery targeting.";
+  }
+
   const container = document.getElementById("options-container");
   container.innerHTML = q.options.map((opt, idx) => `
     <button class="option-btn" id="opt-btn-${idx}" onclick="selectOption(${idx})">

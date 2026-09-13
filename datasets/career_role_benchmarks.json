@@ -90,11 +90,75 @@
           "min_theta": 0.2
         }
       }
+    },
+    {
+      "role_id": "frontend_developer",
+      "title": "Frontend Developer",
+      "readiness_threshold": 78.0,
+      "required_skills": {
+        "Frontend Architecture": {
+          "weight": 0.30,
+          "benchmark_mastery": 0.85,
+          "min_theta": 0.75
+        },
+        "JavaScript & TypeScript": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.80,
+          "min_theta": 0.65
+        },
+        "CSS & Responsive Design": {
+          "weight": 0.20,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.55
+        },
+        "Web Performance & Security": {
+          "weight": 0.15,
+          "benchmark_mastery": 0.70,
+          "min_theta": 0.50
+        },
+        "Data Structures & Algorithms": {
+          "weight": 0.10,
+          "benchmark_mastery": 0.65,
+          "min_theta": 0.40
+        }
+      }
+    },
+    {
+      "role_id": "ai_ml_engineer",
+      "title": "AI/ML Engineer",
+      "readiness_threshold": 82.0,
+      "required_skills": {
+        "Machine Learning": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.85,
+          "min_theta": 0.80
+        },
+        "Deep Learning": {
+          "weight": 0.25,
+          "benchmark_mastery": 0.80,
+          "min_theta": 0.75
+        },
+        "Python": {
+          "weight": 0.20,
+          "benchmark_mastery": 0.80,
+          "min_theta": 0.70
+        },
+        "MLOps & Model Deployment": {
+          "weight": 0.15,
+          "benchmark_mastery": 0.75,
+          "min_theta": 0.60
+        },
+        "Distributed Systems & Scalability": {
+          "weight": 0.15,
+          "benchmark_mastery": 0.70,
+          "min_theta": 0.55
+        }
+      }
     }
   ],
   "metadata": {
     "version": "2026.1",
     "source": "Aggregated Industry Tech Hiring Rubrics",
-    "total_roles": 3
+    "total_roles": 5
   }
 }

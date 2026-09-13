@@ -68,6 +68,44 @@ ROLE_REGISTRY: Dict[str, RoleProfile] = {
             "Statistics": 0.75,
             "Machine Learning": 0.60
         }
+    ),
+    "frontend_developer": RoleProfile(
+        role_id="frontend_developer",
+        title="Frontend Developer",
+        description="Creates high-performance web applications, responsive user interfaces, and modular component architectures.",
+        skill_weights={
+            "Frontend Architecture": 0.30,
+            "JavaScript & TypeScript": 0.25,
+            "CSS & Responsive Design": 0.20,
+            "Web Performance & Security": 0.15,
+            "Data Structures & Algorithms": 0.10
+        },
+        target_thresholds={
+            "Frontend Architecture": 0.85,
+            "JavaScript & TypeScript": 0.80,
+            "CSS & Responsive Design": 0.75,
+            "Web Performance & Security": 0.70,
+            "Data Structures & Algorithms": 0.65
+        }
+    ),
+    "ai_ml_engineer": RoleProfile(
+        role_id="ai_ml_engineer",
+        title="AI/ML Engineer",
+        description="Designs, trains, deploys, and optimizes scalable machine learning and deep learning models in production.",
+        skill_weights={
+            "Machine Learning": 0.25,
+            "Deep Learning": 0.25,
+            "Python": 0.20,
+            "MLOps & Model Deployment": 0.15,
+            "Distributed Systems & Scalability": 0.15
+        },
+        target_thresholds={
+            "Machine Learning": 0.85,
+            "Deep Learning": 0.80,
+            "Python": 0.80,
+            "MLOps & Model Deployment": 0.75,
+            "Distributed Systems & Scalability": 0.70
+        }
     )
 }
 

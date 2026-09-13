@@ -145,6 +145,7 @@ def submit_onboarding(payload: OnboardingSubmitRequest, current_user: dict = Dep
         "message": "Onboarding completed successfully. Profile, skills, and adaptive roadmap initialized.",
         "user_id": user_id,
         "target_role": payload.target_role,
+        "onboarding_completed": True,
         "skills_registered": len(standardized_skills),
         "roadmap_tasks_initialized": len(roadmap_tasks)
     }

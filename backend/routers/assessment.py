@@ -104,7 +104,9 @@ def generate_assessment(
             subtopic=q.get("subtopic", ""),
             difficulty=q.get("difficulty", 3),
             question=q.get("question", ""),
-            options=q.get("options", [])
+            options=q.get("options", []),
+            selection_reason=q.get("selection_reason", ""),
+            selection_score=q.get("selection_score", 0.0)
         ) for q in questions
     ]
 

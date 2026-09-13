@@ -35,6 +35,21 @@ def init_db():
     );
     """)
 
+    # Dynamic migrations for existing databases
+    cursor.execute("PRAGMA table_info(users);")
+    existing_user_cols = {row["name"] for row in cursor.fetchall()}
+    if "password_hash" not in existing_user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN password_hash TEXT;")
+    if "oauth_provider" not in existing_user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN oauth_provider TEXT;")
+    if "oauth_id" not in existing_user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN oauth_id TEXT;")
+    if "target_role" not in existing_user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN target_role TEXT DEFAULT 'data_scientist';")
+    if "onboarding_completed" not in existing_user_cols:
+        cursor.execute("ALTER TABLE users ADD COLUMN onboarding_completed INTEGER DEFAULT 0;")
+
+
     # 2. Student Profiles (Education, Background, Experience, Goals)
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS student_profiles (
@@ -53,6 +68,31 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
+
+    cursor.execute("PRAGMA table_info(student_profiles);")
+    existing_profile_cols = {row["name"] for row in cursor.fetchall()}
+    if "education_level" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN education_level TEXT DEFAULT 'Undergraduate (B.Tech / B.S.)';")
+    if "major" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN major TEXT DEFAULT 'Computer Science';")
+    if "graduation_year" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN graduation_year INTEGER DEFAULT 2026;")
+    if "experience_level" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN experience_level TEXT DEFAULT 'Beginner / Student';")
+    if "placement_goal" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN placement_goal TEXT DEFAULT 'Software / AI Placement 2026';")
+    if "preferred_technologies" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN preferred_technologies TEXT DEFAULT 'Python, SQL, FastApi';")
+    if "soft_skills" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN soft_skills TEXT DEFAULT 'Problem Solving, Communication';")
+    if "theta" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN theta REAL DEFAULT 0.0;")
+    if "total_attempts" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN total_attempts INTEGER DEFAULT 0;")
+    if "correct_attempts" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN correct_attempts INTEGER DEFAULT 0;")
+    if "updated_at" not in existing_profile_cols:
+        cursor.execute("ALTER TABLE student_profiles ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;")
 
     # 3. Categorized User Skills with Descriptive Levels & Confidence
     cursor.execute("""
@@ -73,6 +113,21 @@ def init_db():
         FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
     );
     """)
+
+    cursor.execute("PRAGMA table_info(user_skills);")
+    existing_skill_cols = {row["name"] for row in cursor.fetchall()}
+    if "descriptive_level" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN descriptive_level TEXT DEFAULT 'Average';")
+    if "importance_weight" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN importance_weight REAL DEFAULT 0.20;")
+    if "target_level" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN target_level TEXT DEFAULT 'Good';")
+    if "confidence" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN confidence REAL DEFAULT 0.70;")
+    if "evidence_source" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN evidence_source TEXT DEFAULT 'Assessment';")
+    if "improvement_recommendation" not in existing_skill_cols:
+        cursor.execute("ALTER TABLE user_skills ADD COLUMN improvement_recommendation TEXT;")
 
     # 4. Knowledge States (BKT mastery per concept)
     cursor.execute("""
@@ -152,8 +207,21 @@ def init_db():
     );
     """)
 
+    # Indexes for high-frequency queries
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_skills_uid ON user_skills (user_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_states_uid ON knowledge_states (user_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_question_history_uid ON question_history (user_id, question_id);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_roadmap_tasks_uid ON roadmap_tasks (user_id, target_role);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_placement_progress_uid ON placement_progress (user_id, module_type);")
+
     conn.commit()
     conn.close()
 
-# Initialize DB on module load
+def get_db_connection() -> sqlite3.Connection:
+    conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA foreign_keys = ON;")
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# Initialize DB tables and indexes on module load
 init_db()

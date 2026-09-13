@@ -471,7 +471,237 @@
       "Garbage collection freezes all threads permanently"
     ],
     "answer": 0,
-    "explanation": "The GIL is a mutex preventing race conditions in CPython's memory management, serializing bytecode execution to a single thread at any moment.",
+    "explanation":      "The GIL is a mutex preventing race conditions in CPython's memory management, serializing bytecode execution to a single thread at any moment.",
     "source": "CPython Internals"
+  },
+  {
+    "id": "FE_ARCH_001",
+    "skill": "Frontend Architecture",
+    "concept": "Virtual DOM & Reconciliation",
+    "subtopic": "Diffing Algorithm & Keys",
+    "difficulty": 2,
+    "irt_a": 1.4,
+    "irt_b": -0.4,
+    "type": "mcq",
+    "question": "Why is using array index as a 'key' in dynamically rendered list items considered an anti-pattern in React?",
+    "options": [
+      "It causes JavaScript memory leaks in garbage collection",
+      "If list items are reordered, inserted, or deleted, state can be incorrectly mapped to the wrong DOM node",
+      "Indexes disable component lazy loading",
+      "It forces WebGL rendering mode"
+    ],
+    "answer": 1,
+    "explanation": "Keys identify items for reconciliation. Using array index causes DOM reuse bugs and state mismatch when items reorder or mutate.",
+    "source": "React Architecture"
+  },
+  {
+    "id": "FE_ARCH_002",
+    "skill": "Frontend Architecture",
+    "concept": "State Management & Reactivity",
+    "subtopic": "Unidirectional Data Flow",
+    "difficulty": 3,
+    "irt_a": 1.5,
+    "irt_b": 0.2,
+    "type": "mcq",
+    "question": "What is the primary benefit of unidirectional data flow in modern frontend frameworks (e.g. Redux, Zustand, Pinia)?",
+    "options": [
+      "It renders components directly to canvas without HTML parsing",
+      "State mutations become predictable, debuggable, and traceable through centralized action dispatches",
+      "It completely eliminates the need for HTTP API calls",
+      "It compiles client-side code directly into WebAssembly"
+    ],
+    "answer": 1,
+    "explanation": "Unidirectional data flow ensures data moves in a single direction, making state transitions deterministic and predictable.",
+    "source": "Frontend Systems"
+  },
+  {
+    "id": "JS_TS_001",
+    "skill": "JavaScript & TypeScript",
+    "concept": "Event Loop & Microtasks",
+    "subtopic": "Promise vs setTimeout",
+    "difficulty": 3,
+    "irt_a": 1.6,
+    "irt_b": 0.3,
+    "type": "mcq",
+    "question": "In the JavaScript V8 runtime, what is the execution priority between resolved Promise callbacks and `setTimeout(fn, 0)`?",
+    "options": [
+      "setTimeout executes first because timers have top OS priority",
+      "Promise microtask queue executes completely before the next macrotask (setTimeout) runs",
+      "They run in parallel on separate worker threads",
+      "They execute alternately in round-robin fashion"
+    ],
+    "answer": 1,
+    "explanation": "Microtasks (Promises, queueMicrotask) are drained immediately after the current call stack clears and before any macrotasks (setTimeout, setInterval).",
+    "source": "V8 Runtime Internals"
+  },
+  {
+    "id": "JS_TS_002",
+    "skill": "JavaScript & TypeScript",
+    "concept": "TypeScript Generics & Types",
+    "subtopic": "Conditional Types & infer",
+    "difficulty": 4,
+    "irt_a": 1.7,
+    "irt_b": 1.0,
+    "type": "mcq",
+    "question": "In TypeScript, what keyword is used within conditional types to deduce and extract a type variable dynamically?",
+    "options": ["typeof", "infer", "extends", "keyof"],
+    "answer": 1,
+    "explanation": "The `infer` keyword in TypeScript allows dynamic type extraction within the `extends` clause of conditional types (e.g., `T extends Promise<infer U> ? U : T`).",
+    "source": "TypeScript Handbook"
+  },
+  {
+    "id": "CSS_001",
+    "skill": "CSS & Responsive Design",
+    "concept": "CSS Layouts & Specificity",
+    "subtopic": "Specificity Calculation",
+    "difficulty": 2,
+    "irt_a": 1.3,
+    "irt_b": -0.5,
+    "type": "mcq",
+    "question": "Which CSS selector has the highest specificity score?",
+    "options": [
+      "div.card > p.text",
+      "#main-header .title",
+      "header[data-role='nav'] a:hover",
+      "body section article p"
+    ],
+    "answer": 1,
+    "explanation": "#main-header .title contains 1 ID selector (1-0-0) and 1 class (0-1-0) total (1,1,0), which outweighs class and element combinations.",
+    "source": "CSS Specifications"
+  },
+  {
+    "id": "CSS_002",
+    "skill": "CSS & Responsive Design",
+    "concept": "Modern Responsive CSS",
+    "subtopic": "Container Queries vs Media Queries",
+    "difficulty": 3,
+    "irt_a": 1.5,
+    "irt_b": 0.4,
+    "type": "mcq",
+    "question": "What key architectural advantage do CSS Container Queries (`@container`) offer over standard `@media` queries?",
+    "options": [
+      "They render CSS directly on server side",
+      "They allow components to adapt styles based on their parent container's width rather than viewport dimensions",
+      "They speed up image compression in browser memory",
+      "They replace JavaScript event listeners"
+    ],
+    "answer": 1,
+    "explanation": "Container queries enable modular styling based on the size of the containing element rather than global viewport size.",
+    "source": "Modern Web CSS"
+  },
+  {
+    "id": "WEB_PERF_001",
+    "skill": "Web Performance & Security",
+    "concept": "Core Web Vitals",
+    "subtopic": "INP & LCP",
+    "difficulty": 3,
+    "irt_a": 1.6,
+    "irt_b": 0.5,
+    "type": "mcq",
+    "question": "Which metric replaced First Input Delay (FID) in Google Core Web Vitals to assess overall page responsiveness throughout the entire session?",
+    "options": ["Cumulative Layout Shift (CLS)", "Interaction to Next Paint (INP)", "Largest Contentful Paint (LCP)", "Time to First Byte (TTFB)"],
+    "answer": 1,
+    "explanation": "Interaction to Next Paint (INP) measures the latency of all discrete user interactions (clicks, taps, key presses) across the entire page lifecycle.",
+    "source": "Web Vitals Standard"
+  },
+  {
+    "id": "WEB_PERF_002",
+    "skill": "Web Performance & Security",
+    "concept": "Web Security Defenses",
+    "subtopic": "Content Security Policy (CSP)",
+    "difficulty": 4,
+    "irt_a": 1.8,
+    "irt_b": 1.1,
+    "type": "mcq",
+    "question": "How does a strict Content Security Policy (CSP) with nonces protect against Cross-Site Scripting (XSS)?",
+    "options": [
+      "It encrypts all localStorage payloads with AES-GCM",
+      "The browser only executes script tags containing a cryptographically random, per-request matching nonce generated by the server",
+      "It automatically disables all CSS animations",
+      "It forces all network requests through a WebSocket proxy"
+    ],
+    "answer": 1,
+    "explanation": "CSP nonces ensure injected inline scripts injected by attackers cannot execute because they lack the unique one-time nonce generated server-side.",
+    "source": "OWASP Security"
+  },
+  {
+    "id": "MLOPS_001",
+    "skill": "MLOps & Model Deployment",
+    "concept": "Model Optimization & Quantization",
+    "subtopic": "Post-Training Quantization (INT8)",
+    "difficulty": 3,
+    "irt_a": 1.5,
+    "irt_b": 0.4,
+    "type": "mcq",
+    "question": "What is the primary benefit of 8-bit Integer (INT8) model quantization for neural network inference?",
+    "options": [
+      "It increases model training convergence speed",
+      "It reduces memory bandwidth by 4x and leverages INT8 tensor hardware cores for faster inference with minimal accuracy drop",
+      "It automatically eliminates backpropagation errors",
+      "It guarantees zero validation loss"
+    ],
+    "answer": 1,
+    "explanation": "Quantizing 32-bit floats to INT8 reduces memory footprint by 75% and dramatically accelerates throughput on modern GPU/NPU tensor units.",
+    "source": "MLOps Deployment"
+  },
+  {
+    "id": "MLOPS_002",
+    "skill": "MLOps & Model Deployment",
+    "concept": "Data & Concept Drift",
+    "subtopic": "Drift Detection Methods",
+    "difficulty": 4,
+    "irt_a": 1.7,
+    "irt_b": 0.9,
+    "type": "mcq",
+    "question": "What statistical test is commonly used in MLOps monitoring systems to detect covariate shift between production feature distributions and training data?",
+    "options": [
+      "Kolmogorov-Smirnov (K-S) test or Population Stability Index (PSI)",
+      "Adam optimizer gradient ratio",
+      "K-Means clustering inertia",
+      "Softmax temperature scaling"
+    ],
+    "answer": 0,
+    "explanation": "The Kolmogorov-Smirnov test and PSI compare two empirical probability distributions to flag when live feature data drifts from training distributions.",
+    "source": "Production ML Monitoring"
+  },
+  {
+    "id": "DIST_SYS_001",
+    "skill": "Distributed Systems & Scalability",
+    "concept": "Consensus & Replication",
+    "subtopic": "Raft Consensus Algorithm",
+    "difficulty": 4,
+    "irt_a": 1.8,
+    "irt_b": 1.2,
+    "type": "mcq",
+    "question": "In the Raft distributed consensus protocol, how does a candidate node achieve leadership during an election?",
+    "options": [
+      "By sending a heartbeat before any other node boots",
+      "By securing votes from a strict majority (quorum) of cluster nodes in a specific election term",
+      "By having the lowest IP address in the cluster",
+      "By using proof-of-work hash calculations"
+    ],
+    "answer": 1,
+    "explanation": "Raft elects a leader when a candidate receives affirmative votes from a majority (N/2 + 1) of active nodes for that term.",
+    "source": "Raft Consensus Paper"
+  },
+  {
+    "id": "DIST_SYS_002",
+    "skill": "Distributed Systems & Scalability",
+    "concept": "Consistent Hashing",
+    "subtopic": "Virtual Nodes",
+    "difficulty": 3,
+    "irt_a": 1.6,
+    "irt_b": 0.6,
+    "type": "mcq",
+    "question": "Why do distributed caching and storage clusters (e.g., DynamoDB, Cassandra) use virtual nodes on a consistent hashing ring?",
+    "options": [
+      "To prevent hot-spotting and ensure even key distribution across heterogeneous physical servers",
+      "To convert TCP traffic to UDP",
+      "To eliminate database primary keys",
+      "To enforce strictly synchronous ACID transactions"
+    ],
+    "answer": 0,
+    "explanation": "Virtual nodes map multiple ring positions to each physical server, smoothing out random distribution variance and balancing load evenly.",
+    "source": "Distributed Storage"
   }
 ]

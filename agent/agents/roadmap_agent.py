@@ -171,6 +171,84 @@ ROLE_ROADMAP_TEMPLATES = {
             "description": "Practice real-world analytics case studies and timed live SQL coding challenges.",
             "category": "coding_task", "skill": "SQL"
         }
+    ],
+    "frontend_developer": [
+        # Stage 1: Foundations
+        {
+            "id": "FE_S1_01", "stage": "Stage 1: Core Web & Modern JavaScript",
+            "title": "JavaScript Internals & Async Event Loop",
+            "description": "Master microtasks vs macrotasks, closures, prototypal inheritance, and TypeScript utility types.",
+            "category": "concept", "skill": "JavaScript & TypeScript"
+        },
+        {
+            "id": "FE_S1_02", "stage": "Stage 1: Core Web & Modern JavaScript",
+            "title": "Modern CSS Architecture & Responsive Layouts",
+            "description": "Master Flexbox, CSS Grid, Container Queries, and specificity optimization.",
+            "category": "coding_task", "skill": "CSS & Responsive Design"
+        },
+        # Stage 2: Applied Engineering
+        {
+            "id": "FE_S2_01", "stage": "Stage 2: Component Architecture & State Management",
+            "title": "Virtual DOM & Reconciliation Patterns",
+            "description": "Implement unidirectional data flow, custom hooks, and state management architectures.",
+            "category": "coding_task", "skill": "Frontend Architecture"
+        },
+        {
+            "id": "FE_S2_02", "stage": "Stage 2: Component Architecture & State Management",
+            "title": "Web Performance & Core Web Vitals Optimization",
+            "description": "Optimize Interaction to Next Paint (INP), Largest Contentful Paint (LCP), code-splitting, and CSP security.",
+            "category": "concept", "skill": "Web Performance & Security"
+        },
+        # Stage 3: Portfolio Projects
+        {
+            "id": "FE_S3_01", "stage": "Stage 3: Production Frontend Application",
+            "title": "High-Performance SPA / PWA with Real-time Feeds",
+            "description": "Build a modular, accessible, WCAG-compliant web application with offline service workers.",
+            "category": "project", "skill": "Frontend Architecture"
+        },
+        # Stage 4: Placement Prep
+        {
+            "id": "FE_S4_01", "stage": "Stage 4: Frontend System Design & Live Coding",
+            "title": "Frontend System Design & Component Architecture",
+            "description": "Practice designing complex UI systems (Virtual List, Infinite Scroll, Autocomplete, Rich Text Editor).",
+            "category": "concept", "skill": "Frontend Architecture"
+        }
+    ],
+    "ai_ml_engineer": [
+        # Stage 1: Foundations
+        {
+            "id": "AI_S1_01", "stage": "Stage 1: Mathematical Foundations & Deep Learning",
+            "title": "Neural Network Mathematics & Backpropagation",
+            "description": "Deep-dive into matrix calculus, activation saturation, loss functions, and optimization algorithms.",
+            "category": "concept", "skill": "Deep Learning"
+        },
+        # Stage 2: Applied Engineering
+        {
+            "id": "AI_S2_01", "stage": "Stage 2: Transformer Architectures & Model Training",
+            "title": "Self-Attention Transformers & Fine-Tuning",
+            "description": "Train and fine-tune multi-head self-attention models with FlashAttention and PyTorch.",
+            "category": "coding_task", "skill": "Deep Learning"
+        },
+        {
+            "id": "AI_S2_02", "stage": "Stage 2: Transformer Architectures & Model Training",
+            "title": "MLOps Pipelines & Drift Detection",
+            "description": "Implement automated CI/CD for ML models, feature stores, and statistical data drift detection (K-S / PSI).",
+            "category": "coding_task", "skill": "MLOps & Model Deployment"
+        },
+        # Stage 3: Portfolio Projects
+        {
+            "id": "AI_S3_01", "stage": "Stage 3: Production AI Engine & Inference Engine",
+            "title": "High-Throughput Quantized Inference Microservice",
+            "description": "Deploy an INT8 quantized LLM/Vision model using ONNX Runtime, TensorRT, and Docker.",
+            "category": "project", "skill": "MLOps & Model Deployment"
+        },
+        # Stage 4: Placement Prep
+        {
+            "id": "AI_S4_01", "stage": "Stage 4: AI/ML Technical Interviews & Distributed Systems",
+            "title": "Distributed ML Systems & Model Parallelism",
+            "description": "Design distributed training pipelines (FSDP, DeepSpeed, Pipeline Parallelism, Raft Consensus).",
+            "category": "concept", "skill": "Distributed Systems & Scalability"
+        }
     ]
 }
 

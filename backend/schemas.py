@@ -131,6 +131,8 @@ class AssessmentQuestionResponse(BaseModel):
     difficulty: int
     question: str
     options: List[str]
+    selection_reason: Optional[str] = None
+    selection_score: Optional[float] = None
 
 class AnswerSubmissionItem(BaseModel):
     question_id: str
