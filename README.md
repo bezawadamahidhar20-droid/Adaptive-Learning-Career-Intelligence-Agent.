@@ -170,3 +170,7 @@ Worth knowing before treating this as production-ready:
   effectiveness.
 - **HTTP APIs are the only integration point.** There is no LLM or external service in the
   loop by design.
+
+## License
+
+[MIT](LICENSE).
