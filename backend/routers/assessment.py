@@ -1,17 +1,20 @@
 """
 Assessment Generation & Adaptive Submission Router
+JWT-Authenticated adaptive CAT testing with online BKT & IRT updates.
 """
 import uuid
 from typing import List, Dict, Any
 from datetime import datetime, timezone
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
 from ..schemas import (
-    AssessmentStartRequest, AssessmentQuestionResponse,
-    AssessmentSubmitRequest, AssessmentSubmitResponse, AnswerResult
+    AssessmentQuestionResponse, AssessmentSubmitRequest,
+    AssessmentSubmitResponse, AnswerResult
 )
 from ..database import get_db_connection
+from ..security import get_current_user
 from agent.agent import AdaptiveLearningAgent
+from agent.agents.skill_analyzer import numeric_to_descriptive
 
 router = APIRouter(prefix="/assessment", tags=["assessment"])
 agent = AdaptiveLearningAgent()
@@ -77,14 +80,20 @@ def _load_student_state(user_id: str) -> Dict[str, Any]:
         "correct_attempts": profile_row["correct_attempts"] if profile_row else 0
     }
 
-
 @router.post("/generate", response_model=List[AssessmentQuestionResponse])
-def generate_assessment(payload: AssessmentStartRequest):
-    student_profile = _load_student_state(payload.user_id)
+def generate_assessment(
+    total_questions: int = 10,
+    current_user: dict = Depends(get_current_user)
+):
+    """Generates a personalized adaptive test for the authenticated student."""
+    user_id = current_user["id"]
+    target_role = current_user["target_role"]
+
+    student_profile = _load_student_state(user_id)
     questions = agent.generate_assignment(
         student_profile=student_profile,
-        total_questions=payload.total_questions,
-        target_role=payload.target_role
+        total_questions=total_questions,
+        target_role=target_role
     )
 
     return [
@@ -99,10 +108,17 @@ def generate_assessment(payload: AssessmentStartRequest):
         ) for q in questions
     ]
 
-
 @router.post("/submit", response_model=AssessmentSubmitResponse)
-def submit_assessment(payload: AssessmentSubmitRequest):
-    student_profile = _load_student_state(payload.user_id)
+def submit_assessment(
+    payload: AssessmentSubmitRequest,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Submits student responses, runs online BKT & IRT updates,
+    persists updated states and history, and triggers roadmap adaptation.
+    """
+    user_id = current_user["id"]
+    student_profile = _load_student_state(user_id)
     conn = get_db_connection()
     cursor = conn.cursor()
 
@@ -130,6 +146,7 @@ def submit_assessment(payload: AssessmentSubmitRequest):
             correct_option=res["correct_option"],
             explanation=res["explanation"],
             concept=res["concept"],
+            skill=res["skill"],
             previous_mastery=res["previous_mastery"],
             updated_mastery=res["updated_mastery"],
             updated_theta=res["updated_theta"]
@@ -142,14 +159,26 @@ def submit_assessment(payload: AssessmentSubmitRequest):
         ON CONFLICT(user_id, concept) DO UPDATE SET
             mastery = excluded.mastery,
             last_practiced = excluded.last_practiced
-        """, (payload.user_id, res["concept"], q_data.get("skill", "General"), res["updated_mastery"], now.isoformat()))
+        """, (user_id, res["concept"], q_data.get("skill", "General"), res["updated_mastery"], now.isoformat()))
+
+        # Update aggregated skill in user_skills table
+        new_desc_level = numeric_to_descriptive(res["updated_mastery"])
+        cursor.execute("""
+        INSERT INTO user_skills (user_id, skill_name, category, descriptive_level, numeric_mastery, evidence_source, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'Adaptive Assessment', CURRENT_TIMESTAMP)
+        ON CONFLICT(user_id, skill_name) DO UPDATE SET
+            descriptive_level = excluded.descriptive_level,
+            numeric_mastery = excluded.numeric_mastery,
+            evidence_source = excluded.evidence_source,
+            updated_at = CURRENT_TIMESTAMP
+        """, (user_id, q_data.get("skill", "General"), "Technical", new_desc_level, res["updated_mastery"]))
 
         # Persist attempt into question_history
         cursor.execute("""
         INSERT INTO question_history (user_id, question_id, concept, skill, selected_option, is_correct, theta_after, mastery_after, timestamp)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
-            payload.user_id, q_id, res["concept"], q_data.get("skill", "General"),
+            user_id, q_id, res["concept"], q_data.get("skill", "General"),
             chosen_opt, 1 if res["is_correct"] else 0, res["updated_theta"], res["updated_mastery"], now.isoformat()
         ))
 
@@ -166,7 +195,7 @@ def submit_assessment(payload: AssessmentSubmitRequest):
         len(payload.submissions),
         sum(1 for r in results if r.is_correct),
         now.isoformat(),
-        payload.user_id
+        user_id
     ))
 
     # Record assessment summary
@@ -178,7 +207,7 @@ def submit_assessment(payload: AssessmentSubmitRequest):
     cursor.execute("""
     INSERT INTO assessments (id, user_id, target_role, total_questions, score_percentage)
     VALUES (?, ?, ?, ?, ?)
-    """, (assessment_id, payload.user_id, payload.target_role, total_q, score_pct))
+    """, (assessment_id, user_id, payload.target_role, total_q, score_pct))
 
     conn.commit()
     conn.close()
