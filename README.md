@@ -51,8 +51,9 @@ scaling converges to the identity.
 
 ## Quickstart
 
-Developed and tested against **Python 3.14**. No syntax beyond f-strings, dataclasses, and
-typing is used, so older 3.x releases should work — only 3.14 is verified.
+Tested in CI against **Python 3.12, 3.13, and 3.14** on every push and pull request. The code
+uses no syntax beyond f-strings, dataclasses, and typing, so 3.12 is the oldest verified
+release.
 
 ```bash
 pip install -r requirements.txt
