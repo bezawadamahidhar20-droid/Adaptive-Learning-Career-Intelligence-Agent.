@@ -141,7 +141,7 @@ function formatRoleTitle(roleId) {
 
 // ==================== VIEW NAVIGATION ====================
 function switchView(viewName) {
-  const views = ["dashboard", "roadmap", "placement", "assessment", "results", "career", "theory"];
+  const views = ["dashboard", "roadmap", "placement", "assessment", "results", "career", "profile", "theory"];
   views.forEach(v => {
     const viewEl = document.getElementById(`view-${v}`);
     const navBtn = document.getElementById(`btn-tab-${v}`);
@@ -167,6 +167,7 @@ function switchView(viewName) {
   else if (viewName === "roadmap") loadRoadmapView();
   else if (viewName === "placement") loadPlacementView();
   else if (viewName === "career") loadCareerView();
+  else if (viewName === "profile") loadProfileView();
 }
 
 // ==================== DASHBOARD CONTROLLER ====================
@@ -185,6 +186,22 @@ async function refreshDashboard() {
 }
 
 function renderDashboard(data) {
+  // 0. Overall Knowledge Mastery
+  const overallValEl = document.getElementById("stat-overall-mastery-val");
+  const overallBadgeEl = document.getElementById("overall-mastery-badge");
+  const overallCircle = document.getElementById("overall-mastery-circle");
+  if (overallValEl && data.overall_mastery !== undefined) {
+    overallValEl.textContent = `${data.overall_mastery}%`;
+    if (overallBadgeEl) {
+      overallBadgeEl.textContent = data.overall_mastery >= 75 ? "Proficient" : data.overall_mastery >= 50 ? "Developing" : "Foundational";
+    }
+    if (overallCircle) {
+      const total = 188.5;
+      const offset = total - (total * (data.overall_mastery / 100));
+      overallCircle.style.strokeDashoffset = Math.max(0, offset);
+    }
+  }
+
   // 1. Readiness & Badge
   const readinessValEl = document.getElementById("stat-readiness-val");
   const readinessTargetEl = document.getElementById("stat-readiness-target");
@@ -249,19 +266,46 @@ function renderDashboard(data) {
       : "Not enough data yet | Take your first test below";
   }
 
-  // 5. Explainable Justification Banner
+  // 5. Strengths & Weaknesses Chips + Next Recommended Action
+  const strongContainer = document.getElementById("strongest-skills-container");
+  if (strongContainer) {
+    if (data.strongest_skills && data.strongest_skills.length > 0) {
+      strongContainer.innerHTML = data.strongest_skills.map(s => `<span class="skill-pill pill-green"><i class="fa-solid fa-check"></i> ${s}</span>`).join("");
+    } else {
+      strongContainer.innerHTML = `<span class="skill-pill pill-muted">Calibrating initial skills</span>`;
+    }
+  }
+
+  const weakContainer = document.getElementById("weakest-skills-container");
+  if (weakContainer) {
+    if (data.weakest_skills && data.weakest_skills.length > 0) {
+      weakContainer.innerHTML = data.weakest_skills.map(s => `<span class="skill-pill pill-amber"><i class="fa-solid fa-arrow-trend-up"></i> ${s}</span>`).join("");
+    } else {
+      weakContainer.innerHTML = `<span class="skill-pill pill-muted">No high-risk gaps</span>`;
+    }
+  }
+
+  const recActionEl = document.getElementById("recommended-action-text");
+  if (recActionEl && data.recommended_next_action) {
+    recActionEl.textContent = data.recommended_next_action;
+  }
+
+  // 6. Explainable Justification Banner
   const expText = document.getElementById("career-explanation-text");
   if (expText && data.career_fit) {
     expText.textContent = data.career_fit.explanation;
   }
 
-  // 6. Prioritized Skill Cards
+  // 7. Prioritized Skill Cards
   renderSkillCards(data.skills);
 
-  // 7. Roadmap Preview
+  // 8. Roadmap Preview
   renderDashboardRoadmapPreview(data.roadmap_preview);
 
-  // 8. Next Assessment Preview
+  // 9. Assessment History
+  renderAssessmentHistory(data.assessment_history);
+
+  // 10. Next Assessment Preview
   const launchDesc = document.getElementById("next-assessment-desc");
   const conceptsTags = document.getElementById("target-concepts-preview");
   if (launchDesc && data.top_priority_skill) {
@@ -272,6 +316,47 @@ function renderDashboard(data) {
       <span class="concept-tag"><i class="fa-solid fa-bolt"></i> ${q.concept}</span>
     `).join("");
   }
+}
+
+function renderAssessmentHistory(history) {
+  const container = document.getElementById("dashboard-assessment-history");
+  if (!container) return;
+
+  if (!history || history.length === 0) {
+    container.innerHTML = `
+      <div class="p-card-empty">
+        <i class="fa-solid fa-clipboard-list" style="font-size: 1.8rem; margin-bottom: 0.5rem; opacity: 0.5;"></i>
+        <p>No assessment attempts recorded yet. Launch your first adaptive test above to generate history.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = history.map((item, idx) => `
+    <div class="history-item-row">
+      <div class="history-item-left">
+        <div class="history-badge"><i class="fa-solid fa-bolt text-cyan"></i> Test #${history.length - idx}</div>
+        <div class="history-meta">
+          <span class="history-date">${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'Recent'}</span>
+          <span class="history-role">${formatRoleTitle(item.target_role || 'data_scientist')}</span>
+        </div>
+      </div>
+      <div class="history-item-stats">
+        <div class="h-stat">
+          <span class="h-label">Score</span>
+          <span class="h-val ${item.score_percentage >= 70 ? 'text-emerald' : 'text-amber'}">${item.score_percentage}%</span>
+        </div>
+        <div class="h-stat">
+          <span class="h-label">Correct</span>
+          <span class="h-val">${item.correct_answers} / ${item.total_questions}</span>
+        </div>
+        <div class="h-stat">
+          <span class="h-label">Ability $\theta$</span>
+          <span class="h-val text-indigo">${item.estimated_theta >= 0 ? '+' : ''}${item.estimated_theta.toFixed(2)}</span>
+        </div>
+      </div>
+    </div>
+  `).join("");
 }
 
 function renderSkillCards(skills) {
@@ -872,3 +957,56 @@ async function submitOnboardingForm(e) {
     console.error("Onboarding submission error:", err);
   }
 }
+
+// ==================== PROFILE VIEW CONTROLLER ====================
+async function loadProfileView() {
+  await refreshDashboard();
+  const data = state.dashboardData;
+  const user = state.currentUser;
+
+  if (user) {
+    const avatarLarge = document.getElementById("profile-avatar-large");
+    const nameEl = document.getElementById("profile-full-name");
+    const emailEl = document.getElementById("profile-email-addr");
+    const roleBadge = document.getElementById("profile-role-badge");
+    const targetRoleVal = document.getElementById("profile-target-role-val");
+
+    if (avatarLarge) avatarLarge.textContent = user.name ? user.name.charAt(0) : "S";
+    if (nameEl) nameEl.textContent = user.name || "Scholar Student";
+    if (emailEl) emailEl.textContent = user.email || "scholar@university.edu";
+    if (roleBadge) roleBadge.textContent = formatRoleTitle(user.target_role);
+    if (targetRoleVal) targetRoleVal.textContent = formatRoleTitle(user.target_role);
+  }
+
+  if (data) {
+    const thetaEl = document.getElementById("profile-latent-theta-val");
+    const readinessEl = document.getElementById("profile-career-readiness-val");
+    const totalTestsEl = document.getElementById("profile-total-tests-val");
+    const masteryContainer = document.getElementById("profile-mastery-container");
+
+    if (thetaEl) thetaEl.textContent = `${data.theta >= 0 ? '+' : ''}${data.theta.toFixed(2)}`;
+    if (readinessEl) readinessEl.textContent = `${data.career_readiness}%`;
+    if (totalTestsEl) {
+      const count = data.assessment_history ? data.assessment_history.length : 0;
+      totalTestsEl.textContent = `${count} Assessment Sessions (${data.total_attempts} items answered)`;
+    }
+
+    if (masteryContainer && data.skills) {
+      masteryContainer.innerHTML = data.skills.map(s => {
+        const pct = Math.round(s.numeric_mastery * 100);
+        return `
+          <div class="profile-mastery-row">
+            <div class="p-skill-info">
+              <span class="p-skill-name">${s.skill_name}</span>
+              <span class="p-skill-level text-cyan">${s.descriptive_level} (${pct}%)</span>
+            </div>
+            <div class="p-meter-bar">
+              <div class="p-meter-fill" style="width: ${pct}%;"></div>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+  }
+}
+

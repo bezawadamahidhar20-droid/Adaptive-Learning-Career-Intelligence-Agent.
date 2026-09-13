@@ -161,6 +161,13 @@ class AssessmentSubmitResponse(BaseModel):
     results: List[AnswerResult]
     updated_theta: float
 
+class AssessmentHistoryItem(BaseModel):
+    id: str
+    target_role: str
+    total_questions: int
+    score_percentage: float
+    created_at: str
+
 # ==================== DASHBOARD SCHEMAS ====================
 class DashboardSummaryResponse(BaseModel):
     user_id: str
@@ -172,11 +179,16 @@ class DashboardSummaryResponse(BaseModel):
     total_attempts: int
     correct_attempts: int
     accuracy_percentage: float
+    overall_mastery: float
     career_readiness: float
     is_job_ready: bool
     top_priority_skill: Optional[str]
+    strongest_skills: List[str] = []
+    weakest_skills: List[str] = []
+    recommended_next_action: Optional[str] = None
     skills: List[SkillItemResponse]
     career_fit: ExplainableCareerFitResponse
     roadmap_preview: List[RoadmapTaskResponse]
     next_recommended_assignment: List[AssessmentQuestionResponse]
+    assessment_history: List[AssessmentHistoryItem] = []
     has_sufficient_data: bool

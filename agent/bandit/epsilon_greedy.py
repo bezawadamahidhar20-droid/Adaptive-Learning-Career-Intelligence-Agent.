@@ -87,3 +87,31 @@ class EpsilonGreedyBandit:
 
         # Decay exploration rate
         self.epsilon = max(self.min_epsilon, self.epsilon * self.decay_rate)
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes bandit parameters and arm statistics."""
+        return {
+            "epsilon": self.epsilon,
+            "decay_rate": self.decay_rate,
+            "min_epsilon": self.min_epsilon,
+            "arms": {
+                k: {"pull_count": v.pull_count, "total_reward": v.total_reward}
+                for k, v in self.arms.items()
+            }
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "EpsilonGreedyBandit":
+        """Deserializes bandit from dictionary state."""
+        inst = cls(
+            epsilon=float(data.get("epsilon", 0.15)),
+            decay_rate=float(data.get("decay_rate", 0.995)),
+            min_epsilon=float(data.get("min_epsilon", 0.05))
+        )
+        arms_raw = data.get("arms", {})
+        for k, v in arms_raw.items():
+            inst.arms[k] = ArmStats(
+                pull_count=int(v.get("pull_count", 0)),
+                total_reward=float(v.get("total_reward", 0.0))
+            )
+        return inst

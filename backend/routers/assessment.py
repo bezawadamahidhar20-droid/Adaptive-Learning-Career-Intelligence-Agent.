@@ -36,13 +36,25 @@ def _load_student_state(user_id: str) -> Dict[str, Any]:
     skill_mastery = {}
     skill_counts = {}
     last_practiced = {}
+    now = datetime.now(timezone.utc)
 
     for r in k_rows:
-        concept_mastery[r["concept"]] = r["mastery"]
+        raw_m = r["mastery"]
+        last_str = r["last_practiced"]
+        if last_str:
+            try:
+                last_dt = datetime.fromisoformat(last_str.replace("Z", "+00:00"))
+                decayed_m = agent.forgetting.calculate_decayed_mastery(raw_m, last_dt, now)
+            except Exception:
+                decayed_m = raw_m
+        else:
+            decayed_m = raw_m
+
+        concept_mastery[r["concept"]] = round(decayed_m, 4)
         skill = r["skill"] or "General"
-        skill_mastery[skill] = skill_mastery.get(skill, 0.0) + r["mastery"]
+        skill_mastery[skill] = skill_mastery.get(skill, 0.0) + decayed_m
         skill_counts[skill] = skill_counts.get(skill, 0) + 1
-        last_practiced[r["concept"]] = r["last_practiced"]
+        last_practiced[r["concept"]] = last_str
 
     for s in skill_mastery:
         skill_mastery[s] = round(skill_mastery[s] / skill_counts[s], 4)

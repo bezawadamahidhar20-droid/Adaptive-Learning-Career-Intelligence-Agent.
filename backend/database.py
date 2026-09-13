@@ -207,6 +207,15 @@ def init_db():
     );
     """)
 
+    # 9. Bandit Policy Persistent States
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS bandit_policies (
+        policy_name TEXT PRIMARY KEY,
+        state_json TEXT NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
     # Indexes for high-frequency queries
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_skills_uid ON user_skills (user_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_states_uid ON knowledge_states (user_id);")
@@ -222,6 +231,38 @@ def get_db_connection() -> sqlite3.Connection:
     conn.execute("PRAGMA foreign_keys = ON;")
     conn.row_factory = sqlite3.Row
     return conn
+
+def save_bandit_policy_state(policy_name: str, state_dict: Dict[str, Any]):
+    """Persists bandit policy state into SQLite database."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+        INSERT INTO bandit_policies (policy_name, state_json, updated_at)
+        VALUES (?, ?, CURRENT_TIMESTAMP)
+        ON CONFLICT(policy_name) DO UPDATE SET
+            state_json = excluded.state_json,
+            updated_at = CURRENT_TIMESTAMP
+        """, (policy_name, json.dumps(state_dict)))
+        conn.commit()
+    finally:
+        conn.close()
+
+def load_bandit_policy_state(policy_name: str) -> Optional[Dict[str, Any]]:
+    """Loads bandit policy state from SQLite database."""
+    conn = get_db_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT state_json FROM bandit_policies WHERE policy_name = ?", (policy_name,))
+        row = cursor.fetchone()
+        if row and row["state_json"]:
+            try:
+                return json.loads(row["state_json"])
+            except Exception:
+                return None
+        return None
+    finally:
+        conn.close()
 
 # Initialize DB tables and indexes on module load
 init_db()

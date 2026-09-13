@@ -166,11 +166,13 @@ uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4
 
 ---
 
-## 📄 Documentation
+## 📄 Documentation & Reports
 
-- [Upgrade Audit (UPGRADE_AUDIT.md)](UPGRADE_AUDIT.md)
-- [PRD Compliance Report (PRD_COMPLIANCE_REPORT.md)](PRD_COMPLIANCE_REPORT.md)
-- [5-Minute Demonstration Script (DEMO_SCRIPT.md)](DEMO_SCRIPT.md)
+- **Upgrade Audit & Risk Analysis:** [`DEEPSEEK_UPGRADE_AUDIT.md`](DEEPSEEK_UPGRADE_AUDIT.md)
+- **PRD Compliance & Verification Matrix:** [`DEEPSEEK_PRD_COMPLIANCE_REPORT.md`](DEEPSEEK_PRD_COMPLIANCE_REPORT.md)
+- **5-Minute Live Demonstration Script:** [`DEEPSEEK_DEMO_SCRIPT.md`](DEEPSEEK_DEMO_SCRIPT.md)
+- **Comprehensive Upgrade Audit:** [`UPGRADE_AUDIT.md`](UPGRADE_AUDIT.md)
+- **Interactive Walkthrough:** [`DEMO_SCRIPT.md`](DEMO_SCRIPT.md)
 
 ---
 

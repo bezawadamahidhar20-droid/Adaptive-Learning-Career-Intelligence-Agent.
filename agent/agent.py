@@ -71,8 +71,18 @@ class AdaptiveLearningAgent:
         self.bkt = BKTKnowledgeTracer(concept_params=self.calibrated_params)
         self.irt = IRTModel()
         self.forgetting = ForgettingEngine()
-        self.bandit = EpsilonGreedyBandit()
-        self.linucb = LinUCBContextualBandit()
+
+        # Load persisted bandit states if available
+        try:
+            from backend.database import load_bandit_policy_state
+            b_state = load_bandit_policy_state("epsilon_greedy")
+            self.bandit = EpsilonGreedyBandit.from_dict(b_state) if b_state else EpsilonGreedyBandit()
+            lin_state = load_bandit_policy_state("linucb")
+            self.linucb = LinUCBContextualBandit.from_dict(lin_state) if lin_state else LinUCBContextualBandit()
+        except Exception:
+            self.bandit = EpsilonGreedyBandit()
+            self.linucb = LinUCBContextualBandit()
+
         self.selector = AdaptiveQuestionSelector(bandit=self.bandit)
         self.assignment_builder = AssignmentBuilder(self.question_bank, self.selector)
         self.role_matcher = role_matcher or RoleMatcher()
@@ -213,10 +223,27 @@ class AdaptiveLearningAgent:
         new_theta = self.irt.single_step_theta_update(current_theta, a, b, is_correct)
         student_profile["theta"] = round(new_theta, 4)
 
-        # 4. Update Bandit reward
+        # 4. Update Bandit rewards & policies
         learning_gain = max(0.0, next_mastery - current_mastery)
-        reward = 0.8 if is_correct else 0.3 + learning_gain
+        reward = 0.85 if is_correct else 0.35 + (0.5 * learning_gain)
         self.bandit.update_reward(concept, diff_bin, reward)
+
+        # Update LinUCB Contextual Bandit
+        ctx_vec = [
+            round(current_mastery, 3),
+            round(max(-3.0, min(3.0, current_theta)) / 3.0, 3),
+            1.0 if is_correct else 0.0,
+            round(1.0 / (1.0 + len(student_profile.get("attempt_history", []))), 3),
+            round(diff / 5.0, 3)
+        ]
+        self.linucb.update_arm(concept, ctx_vec, reward)
+
+        try:
+            from backend.database import save_bandit_policy_state
+            save_bandit_policy_state("epsilon_greedy", self.bandit.to_dict())
+            save_bandit_policy_state("linucb", self.linucb.to_dict())
+        except Exception:
+            pass
 
         # 5. Record attempt
         attempt_record = {

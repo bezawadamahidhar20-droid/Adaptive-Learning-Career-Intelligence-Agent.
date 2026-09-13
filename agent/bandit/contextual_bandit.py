@@ -105,3 +105,23 @@ class LinUCBContextualBandit:
         # Update b_a with r * x
         for i in range(self.d):
             self.b[arm_id][i] += reward * context_vector[i]
+
+    def to_dict(self) -> Dict[str, Any]:
+        """Serializes LinUCB model state."""
+        return {
+            "feature_dim": self.d,
+            "alpha": self.alpha,
+            "A": self.A,
+            "b": self.b
+        }
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "LinUCBContextualBandit":
+        """Deserializes LinUCB model from dictionary state."""
+        inst = cls(
+            feature_dim=int(data.get("feature_dim", 5)),
+            alpha=float(data.get("alpha", 0.5))
+        )
+        inst.A = data.get("A", {})
+        inst.b = data.get("b", {})
+        return inst

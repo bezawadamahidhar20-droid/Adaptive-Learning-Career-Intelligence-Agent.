@@ -49,26 +49,47 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
     ORDER BY priority_rank ASC LIMIT 3
     """, (user_id,))
     roadmap_rows = cursor.fetchall()
+
+    # Load recent assessment history
+    cursor.execute("""
+    SELECT id, target_role, total_questions, score_percentage, created_at
+    FROM assessments WHERE user_id = ?
+    ORDER BY created_at DESC LIMIT 10
+    """, (user_id,))
+    assessment_rows = cursor.fetchall()
     conn.close()
 
     # Construct skill items
     skill_items: List[SkillItemResponse] = []
     skill_dict: Dict[str, float] = {}
+    strongest_skills: List[str] = []
+    weakest_skills: List[str] = []
+
     for idx, r in enumerate(skill_rows, 1):
-        skill_dict[r["skill_name"]] = r["numeric_mastery"]
-        desc_level = r["descriptive_level"] or numeric_to_descriptive(r["numeric_mastery"])
+        m_val = r["numeric_mastery"]
+        s_name = r["skill_name"]
+        skill_dict[s_name] = m_val
+        desc_level = r["descriptive_level"] or numeric_to_descriptive(m_val)
+        
+        if m_val >= 0.65:
+            strongest_skills.append(s_name)
+        elif m_val < 0.50:
+            weakest_skills.append(s_name)
+
         skill_items.append(SkillItemResponse(
-            skill_name=r["skill_name"],
+            skill_name=s_name,
             category=r["category"],
             descriptive_level=desc_level,
-            numeric_mastery=r["numeric_mastery"],
+            numeric_mastery=m_val,
             importance_weight=r["importance_weight"],
             target_level=r["target_level"],
             confidence=r["confidence"],
             evidence_source=r["evidence_source"],
-            improvement_recommendation=r["improvement_recommendation"] or f"Continue adaptive practice in {r['skill_name']}.",
+            improvement_recommendation=r["improvement_recommendation"] or f"Continue adaptive practice in {s_name}.",
             priority_rank=idx
         ))
+
+    overall_mastery = round(sum(skill_dict.values()) / max(1, len(skill_dict)) * 100.0, 1) if skill_dict else 0.0
 
     # Evaluate explainable career fit
     fit = agent.career_agent.evaluate_career_fit(target_role, skill_dict)
@@ -99,6 +120,18 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
         ) for r in roadmap_rows
     ]
 
+    # Assessment history
+    from ..schemas import AssessmentHistoryItem
+    assessment_history = [
+        AssessmentHistoryItem(
+            id=r["id"],
+            target_role=r["target_role"],
+            total_questions=r["total_questions"],
+            score_percentage=r["score_percentage"],
+            created_at=str(r["created_at"])
+        ) for r in assessment_rows
+    ]
+
     # Next recommended adaptive assignment
     next_preview_raw = agent.generate_assignment(student_state, total_questions=3, target_role=target_role)
     next_preview = [
@@ -116,7 +149,12 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
     ]
 
     accuracy = round((correct_attempts / max(1, total_attempts)) * 100, 1) if has_sufficient_data else 0.0
-    top_priority = fit.priority_skills_to_learn[0] if fit.priority_skills_to_learn else None
+    top_priority = fit.priority_skills_to_learn[0] if fit.priority_skills_to_learn else (weakest_skills[0] if weakest_skills else None)
+    
+    if top_priority:
+        recommended_action = f"Complete an adaptive CAT session on '{top_priority}' to target your highest-weight gap."
+    else:
+        recommended_action = "Maintain mastery across core competencies with spaced repetition review."
 
     return DashboardSummaryResponse(
         user_id=user_id,
@@ -128,12 +166,17 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
         total_attempts=total_attempts,
         correct_attempts=correct_attempts,
         accuracy_percentage=accuracy,
+        overall_mastery=overall_mastery,
         career_readiness=fit.suitability_score,
         is_job_ready=fit.is_job_ready,
         top_priority_skill=top_priority,
+        strongest_skills=strongest_skills,
+        weakest_skills=weakest_skills,
+        recommended_next_action=recommended_action,
         skills=skill_items,
         career_fit=career_fit_response,
         roadmap_preview=roadmap_preview,
         next_recommended_assignment=next_preview,
+        assessment_history=assessment_history,
         has_sufficient_data=has_sufficient_data
     )

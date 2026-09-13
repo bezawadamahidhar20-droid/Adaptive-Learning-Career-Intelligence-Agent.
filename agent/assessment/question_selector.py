@@ -14,12 +14,14 @@ class AdaptiveQuestionSelector:
         w_fisher: float = 0.40,
         w_weakness: float = 0.35,
         w_novelty: float = 0.15,
+        w_bandit: float = 0.15,
         w_recency_penalty: float = 0.30,
         bandit: Optional[EpsilonGreedyBandit] = None
     ):
         self.w_fisher = w_fisher
         self.w_weakness = w_weakness
         self.w_novelty = w_novelty
+        self.w_bandit = w_bandit
         self.w_recency_penalty = w_recency_penalty
         self.bandit = bandit or EpsilonGreedyBandit()
 
@@ -33,11 +35,14 @@ class AdaptiveQuestionSelector:
     ) -> float:
         """
         Calculates multi-objective priority score for a candidate question.
+        Score(q) = w1*Fisher(q) + w2*Weakness(q) + w3*Novelty(q) + w4*Bandit(q) - w5*RecencyPenalty(q)
         """
         q_id = question["id"]
         concept = question.get("concept", "")
         a = question.get("irt_a", 1.0)
         b = question.get("irt_b", 0.0)
+        diff = question.get("difficulty", 3)
+        diff_bin = "easy" if diff <= 2 else ("medium" if diff == 3 else "hard")
 
         # 1. Fisher Information I(theta)
         fisher_info = IRTModel.fisher_information(student_theta, a, b)
@@ -53,7 +58,12 @@ class AdaptiveQuestionSelector:
         times_seen = len(past_attempts_for_q)
         novelty_score = 1.0 if times_seen == 0 else max(0.0, 1.0 / (1.0 + times_seen))
 
-        # 4. Recency Penalty & Spaced Repetition Cooldown
+        # 4. Bandit Policy Q-Value
+        arm_key = self.bandit._get_arm_key(concept, diff_bin)
+        arm_stat = self.bandit.arms.get(arm_key)
+        bandit_val = arm_stat.average_reward if arm_stat else 0.5
+
+        # 5. Recency Penalty & Spaced Repetition Cooldown
         recency_penalty = 0.0
         if past_attempts_for_q:
             last_attempt = past_attempts_for_q[-1]
@@ -74,7 +84,8 @@ class AdaptiveQuestionSelector:
         total_score = (
             self.w_fisher * normalized_fisher +
             self.w_weakness * weakness_boost +
-            self.w_novelty * novelty_score -
+            self.w_novelty * novelty_score +
+            self.w_bandit * bandit_val -
             self.w_recency_penalty * recency_penalty
         )
 

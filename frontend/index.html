@@ -50,6 +50,9 @@
         <button class="nav-link" id="btn-tab-career" onclick="switchView('career')">
           <i class="fa-solid fa-bullseye"></i> <span>Career Hub</span>
         </button>
+        <button class="nav-link" id="btn-tab-profile" onclick="switchView('profile')">
+          <i class="fa-solid fa-id-card"></i> <span>Profile</span>
+        </button>
         <button class="nav-link" id="btn-tab-theory" onclick="switchView('theory')">
           <i class="fa-solid fa-brain"></i> <span>Agent Core</span>
         </button>
@@ -81,6 +84,32 @@
     <section id="view-dashboard" class="app-view active">
       <!-- Top Metric Cards -->
       <div class="metrics-grid">
+        <!-- Overall Knowledge Mastery Card -->
+        <div class="glass-card stat-card glow-border-indigo">
+          <div class="stat-header">
+            <span class="stat-label">Overall Mastery</span>
+            <span class="status-chip ready-chip" id="overall-mastery-badge">BKT Baseline</span>
+          </div>
+          <div class="stat-body flex-center-between">
+            <div class="stat-number-wrapper">
+              <h2 class="stat-val text-indigo" id="stat-overall-mastery-val">--%</h2>
+              <p class="stat-sub" id="stat-overall-mastery-sub">Across All Target Skills</p>
+            </div>
+            <div class="progress-ring-container">
+              <svg class="progress-ring" width="76" height="76">
+                <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.08)" stroke-width="7" fill="transparent" r="30" cx="38" cy="38"/>
+                <circle id="overall-mastery-circle" class="progress-ring-fill" stroke="url(#indigo-gradient)" stroke-width="7" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke-linecap="round" fill="transparent" r="30" cx="38" cy="38"/>
+                <defs>
+                  <linearGradient id="indigo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#818cf8" />
+                    <stop offset="100%" stop-color="#6366f1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            </div>
+          </div>
+        </div>
+
         <!-- Readiness Card -->
         <div class="glass-card stat-card glow-border-cyan">
           <div class="stat-header">
@@ -157,6 +186,28 @@
         </div>
       </div>
 
+      <!-- Strengths & Weaknesses / Next Action Row -->
+      <div class="glass-card dashboard-intel-banner glow-border-cyan">
+        <div class="intel-banner-grid">
+          <div class="intel-column">
+            <div class="intel-header"><i class="fa-solid fa-trophy text-emerald"></i> <strong>Strongest Skills:</strong></div>
+            <div class="skill-pills-row" id="strongest-skills-container">
+              <span class="skill-pill pill-green">Calibrating...</span>
+            </div>
+          </div>
+          <div class="intel-column">
+            <div class="intel-header"><i class="fa-solid fa-triangle-exclamation text-amber"></i> <strong>Priority Focus (Weakest):</strong></div>
+            <div class="skill-pills-row" id="weakest-skills-container">
+              <span class="skill-pill pill-amber">Calibrating...</span>
+            </div>
+          </div>
+          <div class="intel-column intel-action-col">
+            <div class="intel-header"><i class="fa-solid fa-compass text-indigo"></i> <strong>Recommended Next Step:</strong></div>
+            <p class="intel-action-text" id="recommended-action-text">Complete your first adaptive assessment to calibrate psychometric ability.</p>
+          </div>
+        </div>
+      </div>
+
       <!-- Explainable Career Suitability Banner -->
       <div class="glass-card justification-card glow-border-cyan" id="career-justification-banner">
         <div class="justification-header">
@@ -217,6 +268,19 @@
               <!-- Injected dynamically -->
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Recent Assessment History Section -->
+      <div class="glass-card panel-card" style="margin-top: 1.5rem;">
+        <div class="panel-header flex-center-between">
+          <div>
+            <h3 class="panel-title"><i class="fa-solid fa-clock-rotate-left text-cyan"></i> Recent Assessment Performance History</h3>
+            <p class="panel-desc">Track test scores, ability evolution, and mastery gains across past adaptive sessions.</p>
+          </div>
+        </div>
+        <div class="assessment-history-list" id="dashboard-assessment-history">
+          <!-- Assessment history records injected dynamically -->
         </div>
       </div>
     </section>
@@ -423,7 +487,75 @@
       </div>
     </section>
 
-    <!-- ==================== VIEW 7: THEORY & MECHANICS ==================== -->
+    <!-- ==================== VIEW 7: STUDENT PROFILE & PROGRESS ==================== -->
+    <section id="view-profile" class="app-view">
+      <div class="profile-view-container">
+        <div class="glass-card profile-hero-card glow-border-cyan">
+          <div class="profile-hero-flex">
+            <div class="profile-avatar-large" id="profile-avatar-large">A</div>
+            <div class="profile-info-block">
+              <h2 class="profile-name" id="profile-full-name">Scholar User</h2>
+              <p class="profile-email" id="profile-email-addr">scholar@university.edu</p>
+              <div class="profile-tags-row">
+                <span class="badge badge-purple" id="profile-role-badge">Data Scientist</span>
+                <span class="badge badge-cyan" id="profile-grad-badge">Graduation: 2026</span>
+                <span class="badge badge-diff" id="profile-edu-badge">B.Tech / B.S. CS</span>
+              </div>
+            </div>
+            <div class="profile-action-block">
+              <button class="primary-btn" onclick="openOnboardingModal()">
+                <i class="fa-solid fa-sliders"></i> Recalibrate Baseline
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-grid-2">
+          <!-- Student Mastery Breakdown -->
+          <div class="glass-card panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><i class="fa-solid fa-chart-pie text-indigo"></i> Comprehensive Knowledge State (BKT)</h3>
+              <p class="panel-desc">Calculated with Bayesian inference and exponential retention decay</p>
+            </div>
+            <div class="profile-mastery-list" id="profile-mastery-container">
+              <!-- Injected dynamically -->
+            </div>
+          </div>
+
+          <!-- Academic & Career Calibration -->
+          <div class="glass-card panel-card">
+            <div class="panel-header">
+              <h3 class="panel-title"><i class="fa-solid fa-graduation-cap text-cyan"></i> Placement & Academic Target</h3>
+              <p class="panel-desc">Customized milestone configurations based on onboarding profile</p>
+            </div>
+            <div class="profile-details-list">
+              <div class="profile-detail-row">
+                <span class="p-label">Target Placement Role</span>
+                <span class="p-val text-cyan" id="profile-target-role-val">Data Scientist</span>
+              </div>
+              <div class="profile-detail-row">
+                <span class="p-label">Placement Goal</span>
+                <span class="p-val text-primary" id="profile-placement-goal-val">Campus Placements 2026</span>
+              </div>
+              <div class="profile-detail-row">
+                <span class="p-label">Estimated Latent Ability ($\theta$)</span>
+                <span class="p-val text-indigo" id="profile-latent-theta-val">0.00</span>
+              </div>
+              <div class="profile-detail-row">
+                <span class="p-label">Career Readiness Rating</span>
+                <span class="p-val gradient-text" id="profile-career-readiness-val">--%</span>
+              </div>
+              <div class="profile-detail-row">
+                <span class="p-label">Total Adaptive Assessments Taken</span>
+                <span class="p-val text-emerald" id="profile-total-tests-val">0 Sessions</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VIEW 8: THEORY & MECHANICS ==================== -->
     <section id="view-theory" class="app-view">
       <div class="theory-container">
         <div class="glass-card theory-hero">
