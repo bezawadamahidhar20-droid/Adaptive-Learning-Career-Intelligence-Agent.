@@ -1,5 +1,7 @@
 # Adaptive Learning & Career Intelligence Agent
 
+[![tests](https://github.com/bezawadamahidhar20-droid/Adaptive-Learning-Career-Intelligence-Agent./actions/workflows/tests.yml/badge.svg)](https://github.com/bezawadamahidhar20-droid/Adaptive-Learning-Career-Intelligence-Agent./actions/workflows/tests.yml)
+
 An adaptive assessment platform that estimates what a learner actually knows, picks the
 next question to maximise information gain, and maps the result onto real job
 requirements.
