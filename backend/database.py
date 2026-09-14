@@ -216,12 +216,68 @@ def init_db():
     );
     """)
 
+    # 10. Item Bank & Versioning
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS item_bank (
+        item_id TEXT PRIMARY KEY,
+        concept_id TEXT NOT NULL,
+        difficulty REAL DEFAULT 0.0,
+        discrimination REAL DEFAULT 1.0,
+        guessing REAL DEFAULT 0.20,
+        cognitive_level TEXT DEFAULT 'apply',
+        estimated_seconds INTEGER DEFAULT 90,
+        prerequisites TEXT DEFAULT '[]',
+        exposure_limit REAL DEFAULT 0.25,
+        version INTEGER DEFAULT 1,
+        status TEXT DEFAULT 'active',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    """)
+
+    # 11. Assessment Psychometric Reliability & Uncertainty Store
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS assessment_reliability (
+        assessment_id TEXT PRIMARY KEY,
+        user_id TEXT NOT NULL,
+        theta REAL NOT NULL,
+        posterior_se REAL NOT NULL,
+        response_only_se REAL NOT NULL,
+        observed_info REAL NOT NULL,
+        prior_info REAL NOT NULL,
+        raw_ci_low REAL NOT NULL,
+        raw_ci_high REAL NOT NULL,
+        display_ci_low REAL NOT NULL,
+        display_ci_high REAL NOT NULL,
+        reliability_status TEXT NOT NULL,
+        termination_reason TEXT NOT NULL,
+        estimation_method TEXT DEFAULT 'MAP',
+        item_bank_version TEXT DEFAULT '2026.09',
+        item_count INTEGER NOT NULL,
+        concept_count INTEGER NOT NULL,
+        concept_coverage_ratio REAL NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (assessment_id) REFERENCES assessments (id) ON DELETE CASCADE,
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    """)
+
+    # Dynamic migrations for assessments table
+    cursor.execute("PRAGMA table_info(assessments);")
+    existing_assessment_cols = {row["name"] for row in cursor.fetchall()}
+    if "correct_answers" not in existing_assessment_cols:
+        cursor.execute("ALTER TABLE assessments ADD COLUMN correct_answers INTEGER DEFAULT 0;")
+    if "estimated_theta" not in existing_assessment_cols:
+        cursor.execute("ALTER TABLE assessments ADD COLUMN estimated_theta REAL DEFAULT 0.0;")
+    if "test_type" not in existing_assessment_cols:
+        cursor.execute("ALTER TABLE assessments ADD COLUMN test_type TEXT DEFAULT 'diagnostic';")
+
     # Indexes for high-frequency queries
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_user_skills_uid ON user_skills (user_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_knowledge_states_uid ON knowledge_states (user_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_question_history_uid ON question_history (user_id, question_id);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_roadmap_tasks_uid ON roadmap_tasks (user_id, target_role);")
     cursor.execute("CREATE INDEX IF NOT EXISTS idx_placement_progress_uid ON placement_progress (user_id, module_type);")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_assessment_reliability_uid ON assessment_reliability (user_id);")
 
     conn.commit()
     conn.close()

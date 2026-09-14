@@ -786,19 +786,74 @@ async function showResultsView() {
 
   const data = state.dashboardData;
   if (data) {
-    document.getElementById("result-score-val").textContent = `${data.accuracy_percentage}%`;
-    document.getElementById("result-correct-ratio").textContent = `${data.correct_attempts} / ${data.total_attempts} Total`;
-    document.getElementById("result-theta-val").textContent = `${data.theta >= 0 ? '+' : ''}${data.theta.toFixed(2)}`;
-    document.getElementById("result-readiness-val").textContent = `${data.career_readiness}%`;
+    const scoreVal = document.getElementById("result-score-val");
+    const correctRatio = document.getElementById("result-correct-ratio");
+    const thetaVal = document.getElementById("result-theta-val");
+    const seVal = document.getElementById("result-se-val");
+    const ciVal = document.getElementById("result-ci-val");
+    const relBadge = document.getElementById("result-reliability-badge");
+    const statusBadge = document.getElementById("result-status-badge");
+    const stopReasonBadge = document.getElementById("result-stop-reason-badge");
+    const obsInfoEl = document.getElementById("result-observed-info");
+    const coverageEl = document.getElementById("result-concepts-coverage");
+    const versionEl = document.getElementById("result-item-version");
+    const boundaryAlert = document.getElementById("result-boundary-alert");
+    const boundaryAlertText = document.getElementById("result-boundary-alert-text");
+
+    if (scoreVal) scoreVal.textContent = `${data.accuracy_percentage}%`;
+    if (correctRatio) correctRatio.textContent = `${data.correct_attempts} / ${data.total_attempts} Total`;
+    if (thetaVal) thetaVal.textContent = `${data.theta >= 0 ? '+' : ''}${data.theta.toFixed(2)}`;
+
+    const rel = data.latest_reliability;
+    if (rel) {
+      if (seVal) seVal.textContent = `Posterior SE: ${rel.posterior_standard_error.toFixed(2)} (Resp: ${rel.response_only_standard_error.toFixed(2)})`;
+      if (ciVal) ciVal.textContent = `[${rel.display_interval[0].toFixed(2)}, ${rel.display_interval[1].toFixed(2)}]`;
+      if (relBadge) {
+        relBadge.textContent = `Status: ${rel.reliability_status.toUpperCase()}`;
+        relBadge.className = `score-sub ${rel.reliability_status === 'reliable' ? 'text-emerald' : 'text-amber'}`;
+      }
+      if (statusBadge) {
+        statusBadge.innerHTML = `<i class="fa-solid fa-square-poll-vertical"></i> ${rel.reliability_status === 'reliable' ? 'Validated Reliable Estimate' : 'Provisional Assessment'}`;
+        statusBadge.className = `results-badge ${rel.reliability_status === 'reliable' ? 'badge-reliable' : ''}`;
+      }
+      if (stopReasonBadge) {
+        stopReasonBadge.textContent = rel.termination_reason.replace(/_/g, ' ').toUpperCase();
+      }
+      if (obsInfoEl) obsInfoEl.textContent = `${rel.observed_information.toFixed(2)} (Prior: ${rel.prior_information.toFixed(1)})`;
+      if (coverageEl) coverageEl.textContent = `${rel.concept_count} concepts (${Math.round(rel.concept_coverage_ratio * 100)}% coverage)`;
+      if (versionEl) versionEl.textContent = `${rel.item_bank_version} (Calibrated MAP)`;
+
+      if (boundaryAlert && boundaryAlertText) {
+        if (rel.near_boundary_warning) {
+          boundaryAlertText.textContent = rel.boundary_message || "Estimate is near scale boundary [-4.0, +4.0]. Additional items recommended.";
+          boundaryAlert.classList.remove("hidden");
+        } else {
+          boundaryAlert.classList.add("hidden");
+        }
+      }
+    } else {
+      if (seVal) seVal.textContent = `Posterior SE: ±0.35 (Prior Calibrated)`;
+      if (ciVal) ciVal.textContent = `[${(data.theta - 0.7).toFixed(2)}, ${(data.theta + 0.7).toFixed(2)}]`;
+    }
 
     const container = document.getElementById("results-mastery-list");
     if (container && data.skills) {
-      container.innerHTML = data.skills.map(s => `
-        <div class="breakdown-item">
-          <span class="b-concept">${s.skill_name}</span>
-          <span class="b-delta text-cyan">${s.descriptive_level} (${Math.round(s.numeric_mastery * 100)}%)</span>
-        </div>
-      `).join("");
+      container.innerHTML = data.skills.map(s => {
+        const pct = Math.round(s.numeric_mastery * 100);
+        return `
+          <div class="breakdown-item">
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex: 1;">
+              <span class="b-concept" style="font-weight: 600; min-width: 140px;">${s.skill_name}</span>
+              <div class="p-meter-bar" style="flex: 1; height: 8px;">
+                <div class="p-meter-fill" style="width: ${pct}%;"></div>
+              </div>
+            </div>
+            <span class="b-delta text-cyan" style="font-family: var(--font-mono); font-size: 0.85rem; margin-left: 1rem;">
+              ${s.descriptive_level} (${pct}%)
+            </span>
+          </div>
+        `;
+      }).join("");
     }
   }
 }

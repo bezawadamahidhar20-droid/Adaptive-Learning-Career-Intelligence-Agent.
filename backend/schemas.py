@@ -153,6 +153,25 @@ class AnswerResult(BaseModel):
     updated_mastery: float
     updated_theta: float
 
+class AssessmentReliabilityResponse(BaseModel):
+    theta: float
+    posterior_standard_error: float
+    response_only_standard_error: float
+    observed_information: float
+    prior_information: float
+    raw_interval: List[float]
+    display_interval: List[float]
+    scale_bounds: List[float] = [-4.0, 4.0]
+    near_boundary_warning: bool = False
+    boundary_message: Optional[str] = None
+    item_count: int
+    concept_count: int
+    concept_coverage_ratio: float
+    reliability_status: str  # 'reliable', 'moderate', 'provisional'
+    termination_reason: str  # 'target_precision_reached', 'max_items_reached', etc.
+    estimation_method: str = "MAP"
+    item_bank_version: str = "2026.09"
+
 class AssessmentSubmitResponse(BaseModel):
     assessment_id: str
     total_questions: int
@@ -160,12 +179,18 @@ class AssessmentSubmitResponse(BaseModel):
     score_percentage: float
     results: List[AnswerResult]
     updated_theta: float
+    reliability: Optional[AssessmentReliabilityResponse] = None
 
 class AssessmentHistoryItem(BaseModel):
     id: str
     target_role: str
     total_questions: int
     score_percentage: float
+    correct_answers: Optional[int] = 0
+    estimated_theta: Optional[float] = 0.0
+    reliability_status: Optional[str] = "provisional"
+    posterior_se: Optional[float] = None
+    display_interval: Optional[List[float]] = None
     created_at: str
 
 # ==================== DASHBOARD SCHEMAS ====================
@@ -191,4 +216,6 @@ class DashboardSummaryResponse(BaseModel):
     roadmap_preview: List[RoadmapTaskResponse]
     next_recommended_assignment: List[AssessmentQuestionResponse]
     assessment_history: List[AssessmentHistoryItem] = []
+    latest_reliability: Optional[AssessmentReliabilityResponse] = None
     has_sufficient_data: bool
+

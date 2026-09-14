@@ -196,6 +196,49 @@ def submit_assessment(
             chosen_opt, 1 if res["is_correct"] else 0, res["updated_theta"], res["updated_mastery"], now.isoformat()
         ))
 
+    # Compute iterative MAP ability estimate over current assessment responses
+    from agent.psychometrics.estimation import MAPAbilityEstimator
+    from agent.psychometrics.uncertainty import MeasurementUncertainty, AssessmentReliability
+    from agent.assessment.stopping import CATStoppingEngine
+
+    map_estimator = MAPAbilityEstimator(prior_mean=0.0, prior_std=1.0)
+    session_responses = []
+    for sub in payload.submissions:
+        q_item = agent.question_map.get(sub.question_id)
+        if q_item:
+            res_match = next((r for r in results if r.question_id == sub.question_id), None)
+            session_responses.append({
+                "difficulty": q_item.get("irt_b", 0.0),
+                "discrimination": q_item.get("irt_a", 1.0),
+                "is_correct": res_match.is_correct if res_match else False
+            })
+
+    map_result = map_estimator.estimate(session_responses, initial_theta=student_profile.get("theta", 0.0))
+    final_theta = map_result.theta
+    student_profile["theta"] = final_theta
+
+    # Evaluate Stopping & Uncertainty
+    tested_concepts = {r.concept for r in results if r.concept}
+    role_info = agent.role_matcher.get_role(payload.target_role)
+    total_target_concepts = len(role_info.skill_weights) if role_info else 5
+
+    stopping_engine = CATStoppingEngine(test_type="diagnostic")
+    stopping_dec = stopping_engine.evaluate_stopping(
+        item_count=len(results),
+        posterior_se=map_result.posterior_se,
+        tested_concepts_count=len(tested_concepts),
+        total_target_concepts=total_target_concepts
+    )
+
+    reliability_record = MeasurementUncertainty.evaluate_reliability(
+        ability_estimate=map_result,
+        unique_concepts_tested=len(tested_concepts),
+        total_target_concepts=total_target_concepts,
+        target_se=0.40,
+        min_items=5,
+        termination_reason=stopping_dec.termination_reason
+    )
+
     # Persist updated profile theta & stats
     cursor.execute("""
     UPDATE student_profiles
@@ -205,7 +248,7 @@ def submit_assessment(
         updated_at = ?
     WHERE user_id = ?
     """, (
-        student_profile["theta"],
+        final_theta,
         len(payload.submissions),
         sum(1 for r in results if r.is_correct),
         now.isoformat(),
@@ -219,12 +262,63 @@ def submit_assessment(
     score_pct = round((correct_q / max(1, total_q)) * 100, 1)
 
     cursor.execute("""
-    INSERT INTO assessments (id, user_id, target_role, total_questions, score_percentage)
-    VALUES (?, ?, ?, ?, ?)
-    """, (assessment_id, user_id, payload.target_role, total_q, score_pct))
+    INSERT INTO assessments (id, user_id, target_role, total_questions, score_percentage, correct_answers, estimated_theta, test_type)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (assessment_id, user_id, payload.target_role, total_q, score_pct, correct_q, final_theta, "diagnostic"))
+
+    # Persist into assessment_reliability table
+    cursor.execute("""
+    INSERT INTO assessment_reliability (
+        assessment_id, user_id, theta, posterior_se, response_only_se,
+        observed_info, prior_info, raw_ci_low, raw_ci_high,
+        display_ci_low, display_ci_high, reliability_status,
+        termination_reason, estimation_method, item_bank_version,
+        item_count, concept_count, concept_coverage_ratio, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    """, (
+        assessment_id, user_id, final_theta,
+        reliability_record.posterior_standard_error,
+        reliability_record.response_only_standard_error,
+        reliability_record.observed_information,
+        reliability_record.prior_information,
+        reliability_record.raw_interval[0],
+        reliability_record.raw_interval[1],
+        reliability_record.display_interval[0],
+        reliability_record.display_interval[1],
+        reliability_record.reliability_status,
+        reliability_record.termination_reason,
+        reliability_record.estimation_method,
+        reliability_record.item_bank_version,
+        reliability_record.item_count,
+        reliability_record.concept_count,
+        reliability_record.concept_coverage_ratio,
+        now.isoformat()
+    ))
 
     conn.commit()
     conn.close()
+
+    from ..schemas import AssessmentReliabilityResponse
+
+    rel_resp = AssessmentReliabilityResponse(
+        theta=reliability_record.theta,
+        posterior_standard_error=reliability_record.posterior_standard_error,
+        response_only_standard_error=reliability_record.response_only_standard_error,
+        observed_information=reliability_record.observed_information,
+        prior_information=reliability_record.prior_information,
+        raw_interval=reliability_record.raw_interval,
+        display_interval=reliability_record.display_interval,
+        scale_bounds=reliability_record.scale_bounds,
+        near_boundary_warning=reliability_record.near_boundary_warning,
+        boundary_message=reliability_record.boundary_message,
+        item_count=reliability_record.item_count,
+        concept_count=reliability_record.concept_count,
+        concept_coverage_ratio=reliability_record.concept_coverage_ratio,
+        reliability_status=reliability_record.reliability_status,
+        termination_reason=reliability_record.termination_reason,
+        estimation_method=reliability_record.estimation_method,
+        item_bank_version=reliability_record.item_bank_version
+    )
 
     return AssessmentSubmitResponse(
         assessment_id=assessment_id,
@@ -232,5 +326,7 @@ def submit_assessment(
         correct_count=correct_q,
         score_percentage=score_pct,
         results=results,
-        updated_theta=student_profile["theta"]
+        updated_theta=final_theta,
+        reliability=rel_resp
     )
+

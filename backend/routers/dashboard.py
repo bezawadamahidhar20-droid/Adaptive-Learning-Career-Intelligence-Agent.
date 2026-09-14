@@ -50,13 +50,22 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
     """, (user_id,))
     roadmap_rows = cursor.fetchall()
 
-    # Load recent assessment history
+    # Load recent assessment history with reliability metrics
     cursor.execute("""
-    SELECT id, target_role, total_questions, score_percentage, created_at
-    FROM assessments WHERE user_id = ?
-    ORDER BY created_at DESC LIMIT 10
+    SELECT a.id, a.target_role, a.total_questions, a.score_percentage, a.correct_answers, a.estimated_theta, a.created_at,
+           r.reliability_status, r.posterior_se, r.display_ci_low, r.display_ci_high
+    FROM assessments a
+    LEFT JOIN assessment_reliability r ON a.id = r.assessment_id
+    WHERE a.user_id = ?
+    ORDER BY a.created_at DESC LIMIT 10
     """, (user_id,))
     assessment_rows = cursor.fetchall()
+
+    # Load latest reliability record
+    cursor.execute("""
+    SELECT * FROM assessment_reliability WHERE user_id = ? ORDER BY created_at DESC LIMIT 1
+    """, (user_id,))
+    latest_rel_row = cursor.fetchone()
     conn.close()
 
     # Construct skill items
@@ -121,16 +130,46 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
     ]
 
     # Assessment history
-    from ..schemas import AssessmentHistoryItem
+    from ..schemas import AssessmentHistoryItem, AssessmentReliabilityResponse
     assessment_history = [
         AssessmentHistoryItem(
             id=r["id"],
             target_role=r["target_role"],
             total_questions=r["total_questions"],
             score_percentage=r["score_percentage"],
+            correct_answers=r["correct_answers"] if "correct_answers" in r.keys() else 0,
+            estimated_theta=round(r["estimated_theta"], 2) if ("estimated_theta" in r.keys() and r["estimated_theta"] is not None) else 0.0,
+            reliability_status=r["reliability_status"] if ("reliability_status" in r.keys() and r["reliability_status"]) else "provisional",
+            posterior_se=round(r["posterior_se"], 2) if ("posterior_se" in r.keys() and r["posterior_se"] is not None) else None,
+            display_interval=[r["display_ci_low"], r["display_ci_high"]] if ("display_ci_low" in r.keys() and r["display_ci_low"] is not None) else None,
             created_at=str(r["created_at"])
         ) for r in assessment_rows
     ]
+
+    # Latest reliability object
+    latest_rel_obj = None
+    if latest_rel_row:
+        raw_ci = [latest_rel_row["raw_ci_low"], latest_rel_row["raw_ci_high"]]
+        disp_ci = [latest_rel_row["display_ci_low"], latest_rel_row["display_ci_high"]]
+        latest_rel_obj = AssessmentReliabilityResponse(
+            theta=latest_rel_row["theta"],
+            posterior_standard_error=latest_rel_row["posterior_se"],
+            response_only_standard_error=latest_rel_row["response_only_se"],
+            observed_information=latest_rel_row["observed_info"],
+            prior_information=latest_rel_row["prior_info"],
+            raw_interval=raw_ci,
+            display_interval=disp_ci,
+            scale_bounds=[-4.0, 4.0],
+            near_boundary_warning=(latest_rel_row["theta"] <= -3.5 or latest_rel_row["theta"] >= 3.5),
+            boundary_message=None,
+            item_count=latest_rel_row["item_count"],
+            concept_count=latest_rel_row["concept_count"],
+            concept_coverage_ratio=latest_rel_row["concept_coverage_ratio"],
+            reliability_status=latest_rel_row["reliability_status"],
+            termination_reason=latest_rel_row["termination_reason"],
+            estimation_method=latest_rel_row["estimation_method"],
+            item_bank_version=latest_rel_row["item_bank_version"]
+        )
 
     # Next recommended adaptive assignment
     next_preview_raw = agent.generate_assignment(student_state, total_questions=3, target_role=target_role)
@@ -178,5 +217,6 @@ def get_dashboard_summary(current_user: dict = Depends(get_current_user)):
         roadmap_preview=roadmap_preview,
         next_recommended_assignment=next_preview,
         assessment_history=assessment_history,
+        latest_reliability=latest_rel_obj,
         has_sufficient_data=has_sufficient_data
     )

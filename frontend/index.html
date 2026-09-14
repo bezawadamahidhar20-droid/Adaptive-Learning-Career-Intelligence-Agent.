@@ -397,35 +397,65 @@
     <!-- ==================== VIEW 5: ASSESSMENT RESULTS ==================== -->
     <section id="view-results" class="app-view">
       <div class="results-wrapper">
-        <div class="glass-card results-card">
+        <div class="glass-card results-card glow-border-indigo">
           <div class="results-hero">
-            <div class="results-badge"><i class="fa-solid fa-award"></i> Assessment Complete</div>
-            <h1 class="results-title">Psychometric & Mastery Update</h1>
-            <p class="results-subtitle">Closed-form BKT state update & psychometric theta converged.</p>
+            <div class="results-badge" id="result-status-badge"><i class="fa-solid fa-square-poll-vertical"></i> Psychometric Measurement Report</div>
+            <h1 class="results-title">Adaptive Measurement Summary</h1>
+            <p class="results-subtitle" id="result-meta-subtitle">2PL IRT Maximum A Posteriori (MAP) ability estimate with posterior credible interval.</p>
 
             <div class="results-score-row">
               <div class="result-score-block">
-                <span class="score-label">Score</span>
-                <span class="score-big gradient-text" id="result-score-val">80%</span>
-                <span class="score-sub" id="result-correct-ratio">8 / 10 Correct</span>
+                <span class="score-label">Accuracy & Items</span>
+                <span class="score-big gradient-text" id="result-score-val">--%</span>
+                <span class="score-sub" id="result-correct-ratio">-- / -- Correct</span>
               </div>
               <div class="result-score-block">
-                <span class="score-label">Updated Ability (θ)</span>
-                <span class="score-big text-indigo" id="result-theta-val">+0.54</span>
-                <span class="score-sub">CAT Converged</span>
+                <span class="score-label">Estimated Ability ($\hat{\theta}$)</span>
+                <span class="score-big text-indigo" id="result-theta-val">0.00</span>
+                <span class="score-sub" id="result-se-val">Posterior SE: --</span>
               </div>
               <div class="result-score-block">
-                <span class="score-label">Career Suitability</span>
-                <span class="score-big text-cyan" id="result-readiness-val">62.8%</span>
-                <span class="score-sub">Real DB State</span>
+                <span class="score-label">95% Credible Interval</span>
+                <span class="score-big text-cyan" id="result-ci-val">[-., +.]</span>
+                <span class="score-sub" id="result-reliability-badge">Status: Provisional</span>
               </div>
+            </div>
+          </div>
+
+          <!-- Psychometric Measurement Audit Box -->
+          <div class="glass-card panel-card" style="margin: 1.5rem 0; padding: 1.25rem 1.5rem; background: rgba(15, 23, 42, 0.65);">
+            <div class="flex-center-between" style="margin-bottom: 0.75rem;">
+              <h3 class="panel-title" style="font-size: 1.05rem;"><i class="fa-solid fa-microchip text-cyan"></i> Measurement Audit & Stopping Criteria</h3>
+              <span class="status-chip ready-chip" id="result-stop-reason-badge">Target Precision Reached</span>
+            </div>
+            <div class="intel-banner-grid" style="grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Observed Fisher Information:</span>
+                <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: #fff;" id="result-observed-info">--</div>
+              </div>
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Concepts Assessed:</span>
+                <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--cyan-400);" id="result-concepts-coverage">-- concepts (--% coverage)</div>
+              </div>
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-secondary);">Item Bank Version:</span>
+                <div style="font-family: var(--font-heading); font-size: 1.15rem; font-weight: 700; color: var(--indigo-400);" id="result-item-version">2026.09 (Calibrated)</div>
+              </div>
+            </div>
+            <div class="near-boundary-alert hidden" id="result-boundary-alert" style="margin-top: 0.75rem; font-size: 0.82rem; color: var(--amber-400); background: rgba(245, 158, 11, 0.1); padding: 0.5rem 0.8rem; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <i class="fa-solid fa-triangle-exclamation"></i> <span id="result-boundary-alert-text"></span>
             </div>
           </div>
 
           <!-- Mastery Transition Breakdown -->
           <div class="results-breakdown">
-            <h3 class="section-title"><i class="fa-solid fa-chart-line text-emerald"></i> Knowledge Tracing Updates (BKT)</h3>
+            <h3 class="section-title"><i class="fa-solid fa-chart-line text-emerald"></i> Concept-by-Concept BKT Knowledge States</h3>
             <div class="breakdown-list" id="results-mastery-list"></div>
+          </div>
+
+          <!-- Advisory Disclaimer -->
+          <div style="margin-top: 1.5rem; font-size: 0.76rem; color: var(--text-muted); text-align: center; line-height: 1.45;">
+            <i class="fa-solid fa-shield-halved"></i> <strong>Advisory Educational Measurement Notice:</strong> All estimated abilities and concept masteries are formative educational metrics designed for self-assessment and learning navigation. They do not constitute formal certifications or employment guarantees.
           </div>
 
           <div class="results-actions">
